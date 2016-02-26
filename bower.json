@@ -1,6 +1,6 @@
 {
   "name": "aurelia-loader-webpack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An implementation of Aurelia's loader interface to enable webpack.",
   "keywords": [
     "aurelia",
