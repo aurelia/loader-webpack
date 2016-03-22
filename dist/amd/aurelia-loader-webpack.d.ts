@@ -1,7 +1,14 @@
 declare module 'aurelia-loader-webpack' {
-  import { Origin }  from 'aurelia-metadata';
-  import { Loader }  from 'aurelia-loader';
-  import { DOM, PLATFORM }  from 'aurelia-pal';
+  import {
+    Origin
+  } from 'aurelia-metadata';
+  import {
+    Loader
+  } from 'aurelia-loader';
+  import {
+    DOM,
+    PLATFORM
+  } from 'aurelia-pal';
   
   /**
   * An implementation of the TemplateLoader interface implemented with text-based loading.

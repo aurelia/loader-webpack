@@ -120,14 +120,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.__constructor",
-                "id": 78
+                "id": 157
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.__constructor",
-            "id": 78
+            "id": 157
           }
         },
         {
@@ -185,14 +185,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.addPlugin",
-                "id": 108
+                "id": 187
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.addPlugin",
-            "id": 108
+            "id": 187
           }
         },
         {
@@ -251,14 +251,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.applyPluginToUrl",
-                "id": 104
+                "id": 183
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.applyPluginToUrl",
-            "id": 104
+            "id": 183
           }
         },
         {
@@ -299,20 +299,20 @@
               "type": {
                 "type": "reference",
                 "name": "TemplateRegistryEntry",
-                "id": 62,
+                "id": 141,
                 "moduleName": "\"aurelia-loader\""
               },
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Loader.getOrCreateTemplateRegistryEntry",
-                "id": 112
+                "id": 191
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Loader.getOrCreateTemplateRegistryEntry",
-            "id": 112
+            "id": 191
           }
         },
         {
@@ -357,14 +357,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.loadAllModules",
-                "id": 95
+                "id": 174
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.loadAllModules",
-            "id": 95
+            "id": 174
           }
         },
         {
@@ -409,14 +409,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.loadModule",
-                "id": 92
+                "id": 171
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.loadModule",
-            "id": 92
+            "id": 171
           }
         },
         {
@@ -461,14 +461,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.loadTemplate",
-                "id": 98
+                "id": 177
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.loadTemplate",
-            "id": 98
+            "id": 177
           }
         },
         {
@@ -513,14 +513,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.loadText",
-                "id": 101
+                "id": 180
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.loadText",
-            "id": 101
+            "id": 180
           }
         },
         {
@@ -578,14 +578,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.map",
-                "id": 80
+                "id": 159
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.map",
-            "id": 80
+            "id": 159
           }
         },
         {
@@ -644,14 +644,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.normalize",
-                "id": 88
+                "id": 167
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.normalize",
-            "id": 88
+            "id": 167
           }
         },
         {
@@ -710,14 +710,14 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Loader.normalizeSync",
-                "id": 84
+                "id": 163
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Loader.normalizeSync",
-            "id": 84
+            "id": 163
           }
         },
         {
@@ -792,7 +792,7 @@
         {
           "type": "reference",
           "name": "Loader",
-          "id": 77
+          "id": 156
         }
       ]
     }
