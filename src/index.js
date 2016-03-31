@@ -50,8 +50,8 @@ export class WebpackLoader extends Loader {
   constructor() {
     super();
 
-    this.moduleRegistry = {};
-    this.loaderPlugins = {};
+    this.moduleRegistry = Object.create(null);
+    this.loaderPlugins = Object.create(null);
     this.useTemplateLoader(new TextTemplateLoader());
 
     let that = this;
