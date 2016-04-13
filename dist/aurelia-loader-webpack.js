@@ -46,12 +46,11 @@ function ensureOriginOnExports(executed, name) {
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
 export class WebpackLoader extends Loader {
-
   constructor() {
     super();
 
-    this.moduleRegistry = {};
-    this.loaderPlugins = {};
+    this.moduleRegistry = Object.create(null);
+    this.loaderPlugins = Object.create(null);
     this.useTemplateLoader(new TextTemplateLoader());
 
     let that = this;
@@ -62,6 +61,16 @@ export class WebpackLoader extends Loader {
         return entry.templateIsLoaded ? entry : that.templateLoader.loadTemplate(that, entry).then(x => entry);
       }
     });
+
+    PLATFORM.eachModule = callback => {
+      let registry = this.moduleRegistry;
+
+      for (let key in registry) {
+        try {
+          if (callback(key, registry[key])) return;
+        } catch (e) {}
+      }
+    };
   }
 
   _import(moduleId) {
@@ -203,5 +212,3 @@ export class WebpackLoader extends Loader {
 }
 
 PLATFORM.Loader = WebpackLoader;
-
-PLATFORM.eachModule = function(callback) {};

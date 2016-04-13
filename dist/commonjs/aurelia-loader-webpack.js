@@ -61,8 +61,8 @@ var WebpackLoader = exports.WebpackLoader = function (_Loader) {
 
     var _this = _possibleConstructorReturn(this, _Loader.call(this));
 
-    _this.moduleRegistry = {};
-    _this.loaderPlugins = {};
+    _this.moduleRegistry = Object.create(null);
+    _this.loaderPlugins = Object.create(null);
     _this.useTemplateLoader(new TextTemplateLoader());
 
     var that = _this;
@@ -75,6 +75,16 @@ var WebpackLoader = exports.WebpackLoader = function (_Loader) {
         });
       }
     });
+
+    _aureliaPal.PLATFORM.eachModule = function (callback) {
+      var registry = _this.moduleRegistry;
+
+      for (var key in registry) {
+        try {
+          if (callback(key, registry[key])) return;
+        } catch (e) {}
+      }
+    };
     return _this;
   }
 
@@ -171,5 +181,3 @@ var WebpackLoader = exports.WebpackLoader = function (_Loader) {
 }(_aureliaLoader.Loader);
 
 _aureliaPal.PLATFORM.Loader = WebpackLoader;
-
-_aureliaPal.PLATFORM.eachModule = function (callback) {};

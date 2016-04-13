@@ -89,8 +89,8 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
 
           var _this = _possibleConstructorReturn(this, _Loader.call(this));
 
-          _this.moduleRegistry = {};
-          _this.loaderPlugins = {};
+          _this.moduleRegistry = Object.create(null);
+          _this.loaderPlugins = Object.create(null);
           _this.useTemplateLoader(new TextTemplateLoader());
 
           var that = _this;
@@ -103,6 +103,16 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
               });
             }
           });
+
+          PLATFORM.eachModule = function (callback) {
+            var registry = _this.moduleRegistry;
+
+            for (var key in registry) {
+              try {
+                if (callback(key, registry[key])) return;
+              } catch (e) {}
+            }
+          };
           return _this;
         }
 
@@ -201,8 +211,6 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
       _export('WebpackLoader', WebpackLoader);
 
       PLATFORM.Loader = WebpackLoader;
-
-      PLATFORM.eachModule = function (callback) {};
     }
   };
 });
