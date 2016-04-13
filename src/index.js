@@ -81,6 +81,9 @@ export class WebpackLoader extends Loader {
     return new Promise((resolve, reject) => {
       try {
         if (loaderPlugin) {
+          if (loaderPlugin === "css-resource-plugin") {
+            path = "!!raw!" + path;
+          }
           resolve(this.loaderPlugins[loaderPlugin].fetch(path));
         } else {
           require.ensure([], function(require) {
