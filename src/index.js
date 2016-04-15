@@ -25,7 +25,7 @@ function ensureOriginOnExports(executed, name) {
   let key;
   let exportedValue;
 
-  if (target.__useDefault) {
+  if (target && target.__useDefault) {
     target = target.default;
   }
 
