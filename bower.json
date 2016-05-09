@@ -8,6 +8,8 @@
     "loader"
   ],
   "homepage": "http://aurelia.io",
+  "main": "dist/commonjs/aurelia-loader-webpack.js",
+  "moduleType": "node",
   "bugs": {
     "url": "https://github.com/aurelia/loader-webpack/issues"
   },
