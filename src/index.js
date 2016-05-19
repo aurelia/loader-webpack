@@ -90,7 +90,7 @@ export class WebpackLoader extends Loader {
             } else {
               resolve(result);
             }
-          });
+          }, 'app');
         }
       } catch (e) {
         reject(e);
