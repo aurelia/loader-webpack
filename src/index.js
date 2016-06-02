@@ -188,7 +188,14 @@ export class WebpackLoader extends Loader {
   * @return A Promise for text content.
   */
   loadText(url) {
-    return this._import(url);
+    return this._import(url).then(result => {
+      if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+        // we're dealing with a file loaded using the css-loader:
+        return result.toString();
+      } else {
+        return result;
+      }
+    });
   }
 
   /**
