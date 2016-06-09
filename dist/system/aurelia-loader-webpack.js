@@ -137,7 +137,7 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
                   } else {
                     resolve(result);
                   }
-                });
+                }, 'app');
               }
             } catch (e) {
               reject(e);
@@ -194,7 +194,13 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
         };
 
         WebpackLoader.prototype.loadText = function loadText(url) {
-          return this._import(url);
+          return this._import(url).then(function (result) {
+            if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+              return result.toString();
+            }
+
+            return result;
+          });
         };
 
         WebpackLoader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {

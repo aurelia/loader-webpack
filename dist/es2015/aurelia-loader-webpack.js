@@ -77,7 +77,7 @@ export let WebpackLoader = class WebpackLoader extends Loader {
             } else {
               resolve(result);
             }
-          });
+          }, 'app');
         }
       } catch (e) {
         reject(e);
@@ -132,7 +132,13 @@ export let WebpackLoader = class WebpackLoader extends Loader {
   }
 
   loadText(url) {
-    return this._import(url);
+    return this._import(url).then(result => {
+      if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+        return result.toString();
+      }
+
+      return result;
+    });
   }
 
   applyPluginToUrl(url, pluginName) {

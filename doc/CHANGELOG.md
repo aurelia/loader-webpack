@@ -1,3 +1,13 @@
+### 1.0.0-beta.1.0.3 (2016-06-09)
+
+
+#### Features
+
+* **index:**
+  * support css-loader ([c767f849](http://github.com/aurelia/loader-webpack/commit/c767f849ed7375990db105fb559a46b325c3e4e1))
+  * use a named chunk ([12ab2481](http://github.com/aurelia/loader-webpack/commit/12ab2481b1ebbfbc8cbf68c4ad8dcbaabd44d852))
+
+
 ### 1.0.0-beta.1.0.2 (2016-05-10)
 
 
