@@ -12,12 +12,9 @@ machine:
 dependencies:
   pre:
     - npm install -g gulp
-    - npm install -g jspm
   override:
     - npm install
-    - jspm install
 
 test:
   override:
     - gulp build
-    - gulp test
