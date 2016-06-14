@@ -1,30 +1,21 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.WebpackLoader = exports.TextTemplateLoader = undefined;
-
-var _aureliaMetadata = require('aurelia-metadata');
-
-var _aureliaLoader = require('aurelia-loader');
-
-var _aureliaPal = require('aurelia-pal');
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 
 
-var TextTemplateLoader = exports.TextTemplateLoader = function () {
+import { Origin } from 'aurelia-metadata';
+import { Loader } from 'aurelia-loader';
+import { DOM, PLATFORM } from 'aurelia-pal';
+
+export var TextTemplateLoader = function () {
   function TextTemplateLoader() {
     
   }
 
   TextTemplateLoader.prototype.loadTemplate = function loadTemplate(loader, entry) {
     return loader.loadText(entry.address).then(function (text) {
-      entry.template = _aureliaPal.DOM.createTemplateFromMarkup(text);
+      entry.template = DOM.createTemplateFromMarkup(text);
     });
   };
 
@@ -40,20 +31,20 @@ function ensureOriginOnExports(executed, name) {
     target = target.default;
   }
 
-  _aureliaMetadata.Origin.set(target, new _aureliaMetadata.Origin(name, 'default'));
+  Origin.set(target, new Origin(name, 'default'));
 
   for (key in target) {
     exportedValue = target[key];
 
     if (typeof exportedValue === 'function') {
-      _aureliaMetadata.Origin.set(exportedValue, new _aureliaMetadata.Origin(name, key));
+      Origin.set(exportedValue, new Origin(name, key));
     }
   }
 
   return executed;
 }
 
-var WebpackLoader = exports.WebpackLoader = function (_Loader) {
+export var WebpackLoader = function (_Loader) {
   _inherits(WebpackLoader, _Loader);
 
   function WebpackLoader() {
@@ -76,7 +67,7 @@ var WebpackLoader = exports.WebpackLoader = function (_Loader) {
       }
     });
 
-    _aureliaPal.PLATFORM.eachModule = function (callback) {
+    PLATFORM.eachModule = function (callback) {
       var registry = _this.moduleRegistry;
 
       for (var key in registry) {
@@ -184,6 +175,6 @@ var WebpackLoader = exports.WebpackLoader = function (_Loader) {
   };
 
   return WebpackLoader;
-}(_aureliaLoader.Loader);
+}(Loader);
 
-_aureliaPal.PLATFORM.Loader = WebpackLoader;
+PLATFORM.Loader = WebpackLoader;

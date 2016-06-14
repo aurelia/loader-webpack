@@ -30,15 +30,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   var TextTemplateLoader = exports.TextTemplateLoader = function () {
     function TextTemplateLoader() {
-      _classCallCheck(this, TextTemplateLoader);
+      
     }
 
     TextTemplateLoader.prototype.loadTemplate = function loadTemplate(loader, entry) {
@@ -76,7 +72,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
     _inherits(WebpackLoader, _Loader);
 
     function WebpackLoader() {
-      _classCallCheck(this, WebpackLoader);
+      
 
       var _this = _possibleConstructorReturn(this, _Loader.call(this));
 

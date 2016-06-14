@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function (_export, _context) {
+  "use strict";
+
   var Origin, Loader, DOM, PLATFORM, TextTemplateLoader, WebpackLoader;
 
   function _possibleConstructorReturn(self, call) {
@@ -27,11 +29,7 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   function ensureOriginOnExports(executed, name) {
     var target = executed;
@@ -67,7 +65,7 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
     execute: function () {
       _export('TextTemplateLoader', TextTemplateLoader = function () {
         function TextTemplateLoader() {
-          _classCallCheck(this, TextTemplateLoader);
+          
         }
 
         TextTemplateLoader.prototype.loadTemplate = function loadTemplate(loader, entry) {
@@ -85,7 +83,7 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
         _inherits(WebpackLoader, _Loader);
 
         function WebpackLoader() {
-          _classCallCheck(this, WebpackLoader);
+          
 
           var _this = _possibleConstructorReturn(this, _Loader.call(this));
 
