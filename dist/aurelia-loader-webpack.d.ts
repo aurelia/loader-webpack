@@ -28,7 +28,6 @@ export declare class TextTemplateLoader {
 */
 export declare class WebpackLoader extends Loader {
   constructor();
-  _import(moduleId?: any): any;
   
   /**
     * Maps a module id to a source.
