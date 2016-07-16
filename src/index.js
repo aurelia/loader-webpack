@@ -160,9 +160,7 @@ export class WebpackLoader extends Loader {
       return Promise.resolve(existing);
     }
 
-    return this._import(id).then(m => {
-      return this.moduleRegistry[id] = m;
-    });
+    return this._import(id).then(m => this.moduleRegistry[id] = m);
   }
 
   /**
