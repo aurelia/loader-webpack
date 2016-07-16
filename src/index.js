@@ -19,8 +19,7 @@ export class TextTemplateLoader {
   }
 }
 
-
-function ensureOriginOnExports(executed, name) {
+export function ensureOriginOnExports(executed, moduleId) {
   let target = executed;
   let key;
   let exportedValue;
@@ -35,7 +34,7 @@ function ensureOriginOnExports(executed, name) {
     exportedValue = target[key];
 
     if (typeof exportedValue === 'function') {
-      Origin.set(exportedValue, new Origin(name, key));
+      Origin.set(exportedValue, new Origin(moduleId, key));
     }
   }
 
@@ -161,15 +160,8 @@ export class WebpackLoader extends Loader {
       return Promise.resolve(existing);
     }
 
-    return new Promise((resolve, reject) => {
-      try {
-        this._import(id).then(m => {
-          this.moduleRegistry[id] = m;
-          resolve(ensureOriginOnExports(m, id));
-        });
-      } catch (e) {
-        reject(e);
-      }
+    return this._import(id).then(m => {
+      return this.moduleRegistry[id] = m;
     });
   }
 
