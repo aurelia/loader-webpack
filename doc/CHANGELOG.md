@@ -1,3 +1,15 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-rc.1.0.0...v1.0.0) (2016-07-27)
+
+
+### Features
+
+* **index:** expose ensureOriginOnExports and simplify loadModule ([b6a3ed0](https://github.com/aurelia/loader-webpack/commit/b6a3ed0))
+* **index:** further simplify loadModule ([4fe5405](https://github.com/aurelia/loader-webpack/commit/4fe5405))
+* **index:** implement PLATFORM.eachModule ([a942c57](https://github.com/aurelia/loader-webpack/commit/a942c57))
+
+
+
 <a name="1.0.0-rc.1.0.0"></a>
 # [1.0.0-rc.1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-beta.2.0.1...v1.0.0-rc.1.0.0) (2016-06-22)
 
