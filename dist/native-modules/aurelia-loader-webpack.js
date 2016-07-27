@@ -1,3 +1,5 @@
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -22,7 +24,7 @@ export var TextTemplateLoader = function () {
   return TextTemplateLoader;
 }();
 
-function ensureOriginOnExports(executed, name) {
+export function ensureOriginOnExports(executed, moduleId) {
   var target = executed;
   var key = void 0;
   var exportedValue = void 0;
@@ -31,13 +33,15 @@ function ensureOriginOnExports(executed, name) {
     target = target.default;
   }
 
-  Origin.set(target, new Origin(name, 'default'));
+  Origin.set(target, new Origin(moduleId, 'default'));
 
-  for (key in target) {
-    exportedValue = target[key];
+  if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object') {
+    for (key in target) {
+      exportedValue = target[key];
 
-    if (typeof exportedValue === 'function') {
-      Origin.set(exportedValue, new Origin(name, key));
+      if (typeof exportedValue === 'function') {
+        Origin.set(exportedValue, new Origin(moduleId, key));
+      }
     }
   }
 
@@ -68,11 +72,18 @@ export var WebpackLoader = function (_Loader) {
     });
 
     PLATFORM.eachModule = function (callback) {
-      var registry = _this.moduleRegistry;
+      var registry = __webpack_require__.c;
 
-      for (var key in registry) {
+      for (var moduleId in registry) {
+        if (typeof moduleId !== 'string') {
+          continue;
+        }
+        var moduleExports = registry[moduleId].exports;
+        if ((typeof moduleExports === 'undefined' ? 'undefined' : _typeof(moduleExports)) !== 'object') {
+          continue;
+        }
         try {
-          if (callback(key, registry[key])) return;
+          if (callback(moduleId, moduleExports)) return;
         } catch (e) {}
       }
     };
@@ -91,6 +102,11 @@ export var WebpackLoader = function (_Loader) {
         if (loaderPlugin) {
           resolve(_this2.loaderPlugins[loaderPlugin].fetch(path));
         } else {
+          try {
+            var result = __webpack_require__(path);
+            resolve(result);
+            return;
+          } catch (_) {}
           require.ensure([], function (require) {
             var result = require('aurelia-loader-context/' + path);
             if (typeof result === 'function') {
@@ -139,16 +155,8 @@ export var WebpackLoader = function (_Loader) {
     if (existing) {
       return Promise.resolve(existing);
     }
-
-    return new Promise(function (resolve, reject) {
-      try {
-        _this3._import(id).then(function (m) {
-          _this3.moduleRegistry[id] = m;
-          resolve(ensureOriginOnExports(m, id));
-        });
-      } catch (e) {
-        reject(e);
-      }
+    return this._import(id).then(function (m) {
+      return _this3.moduleRegistry[id] = ensureOriginOnExports(m, id);
     });
   };
 

@@ -5,6 +5,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
     value: true
   });
   exports.WebpackLoader = exports.TextTemplateLoader = undefined;
+  exports.ensureOriginOnExports = ensureOriginOnExports;
 
   function _possibleConstructorReturn(self, call) {
     if (!self) {
@@ -30,6 +31,12 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
   
 
   var TextTemplateLoader = exports.TextTemplateLoader = function () {
@@ -46,7 +53,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
     return TextTemplateLoader;
   }();
 
-  function ensureOriginOnExports(executed, name) {
+  function ensureOriginOnExports(executed, moduleId) {
     var target = executed;
     var key = void 0;
     var exportedValue = void 0;
@@ -55,13 +62,15 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
       target = target.default;
     }
 
-    _aureliaMetadata.Origin.set(target, new _aureliaMetadata.Origin(name, 'default'));
+    _aureliaMetadata.Origin.set(target, new _aureliaMetadata.Origin(moduleId, 'default'));
 
-    for (key in target) {
-      exportedValue = target[key];
+    if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object') {
+      for (key in target) {
+        exportedValue = target[key];
 
-      if (typeof exportedValue === 'function') {
-        _aureliaMetadata.Origin.set(exportedValue, new _aureliaMetadata.Origin(name, key));
+        if (typeof exportedValue === 'function') {
+          _aureliaMetadata.Origin.set(exportedValue, new _aureliaMetadata.Origin(moduleId, key));
+        }
       }
     }
 
@@ -92,11 +101,18 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
       });
 
       _aureliaPal.PLATFORM.eachModule = function (callback) {
-        var registry = _this.moduleRegistry;
+        var registry = __webpack_require__.c;
 
-        for (var key in registry) {
+        for (var moduleId in registry) {
+          if (typeof moduleId !== 'string') {
+            continue;
+          }
+          var moduleExports = registry[moduleId].exports;
+          if ((typeof moduleExports === 'undefined' ? 'undefined' : _typeof(moduleExports)) !== 'object') {
+            continue;
+          }
           try {
-            if (callback(key, registry[key])) return;
+            if (callback(moduleId, moduleExports)) return;
           } catch (e) {}
         }
       };
@@ -115,6 +131,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
           if (loaderPlugin) {
             resolve(_this2.loaderPlugins[loaderPlugin].fetch(path));
           } else {
+            try {
+              var result = __webpack_require__(path);
+              resolve(result);
+              return;
+            } catch (_) {}
             require.ensure([], function (require) {
               var result = require('aurelia-loader-context/' + path);
               if (typeof result === 'function') {
@@ -163,16 +184,8 @@ define(['exports', 'aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], functio
       if (existing) {
         return Promise.resolve(existing);
       }
-
-      return new Promise(function (resolve, reject) {
-        try {
-          _this3._import(id).then(function (m) {
-            _this3.moduleRegistry[id] = m;
-            resolve(ensureOriginOnExports(m, id));
-          });
-        } catch (e) {
-          reject(e);
-        }
+      return this._import(id).then(function (m) {
+        return _this3.moduleRegistry[id] = ensureOriginOnExports(m, id);
       });
     };
 

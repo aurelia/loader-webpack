@@ -3,7 +3,7 @@
 System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function (_export, _context) {
   "use strict";
 
-  var Origin, Loader, DOM, PLATFORM, TextTemplateLoader, WebpackLoader;
+  var Origin, Loader, DOM, PLATFORM, _typeof, TextTemplateLoader, WebpackLoader;
 
   function _possibleConstructorReturn(self, call) {
     if (!self) {
@@ -31,7 +31,7 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
 
   
 
-  function ensureOriginOnExports(executed, name) {
+  function ensureOriginOnExports(executed, moduleId) {
     var target = executed;
     var key = void 0;
     var exportedValue = void 0;
@@ -40,18 +40,22 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
       target = target.default;
     }
 
-    Origin.set(target, new Origin(name, 'default'));
+    Origin.set(target, new Origin(moduleId, 'default'));
 
-    for (key in target) {
-      exportedValue = target[key];
+    if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object') {
+      for (key in target) {
+        exportedValue = target[key];
 
-      if (typeof exportedValue === 'function') {
-        Origin.set(exportedValue, new Origin(name, key));
+        if (typeof exportedValue === 'function') {
+          Origin.set(exportedValue, new Origin(moduleId, key));
+        }
       }
     }
 
     return executed;
   }
+
+  _export('ensureOriginOnExports', ensureOriginOnExports);
 
   return {
     setters: [function (_aureliaMetadata) {
@@ -63,6 +67,12 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
       PLATFORM = _aureliaPal.PLATFORM;
     }],
     execute: function () {
+      _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+      } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+      };
+
       _export('TextTemplateLoader', TextTemplateLoader = function () {
         function TextTemplateLoader() {
           
@@ -103,11 +113,18 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
           });
 
           PLATFORM.eachModule = function (callback) {
-            var registry = _this.moduleRegistry;
+            var registry = __webpack_require__.c;
 
-            for (var key in registry) {
+            for (var moduleId in registry) {
+              if (typeof moduleId !== 'string') {
+                continue;
+              }
+              var moduleExports = registry[moduleId].exports;
+              if ((typeof moduleExports === 'undefined' ? 'undefined' : _typeof(moduleExports)) !== 'object') {
+                continue;
+              }
               try {
-                if (callback(key, registry[key])) return;
+                if (callback(moduleId, moduleExports)) return;
               } catch (e) {}
             }
           };
@@ -126,6 +143,11 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
               if (loaderPlugin) {
                 resolve(_this2.loaderPlugins[loaderPlugin].fetch(path));
               } else {
+                try {
+                  var result = __webpack_require__(path);
+                  resolve(result);
+                  return;
+                } catch (_) {}
                 require.ensure([], function (require) {
                   var result = require('aurelia-loader-context/' + path);
                   if (typeof result === 'function') {
@@ -174,16 +196,8 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
           if (existing) {
             return Promise.resolve(existing);
           }
-
-          return new Promise(function (resolve, reject) {
-            try {
-              _this3._import(id).then(function (m) {
-                _this3.moduleRegistry[id] = m;
-                resolve(ensureOriginOnExports(m, id));
-              });
-            } catch (e) {
-              reject(e);
-            }
+          return this._import(id).then(function (m) {
+            return _this3.moduleRegistry[id] = ensureOriginOnExports(m, id);
           });
         };
 

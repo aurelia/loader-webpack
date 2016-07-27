@@ -10,7 +10,7 @@ export let TextTemplateLoader = class TextTemplateLoader {
   }
 };
 
-function ensureOriginOnExports(executed, name) {
+export function ensureOriginOnExports(executed, moduleId) {
   let target = executed;
   let key;
   let exportedValue;
@@ -19,13 +19,15 @@ function ensureOriginOnExports(executed, name) {
     target = target.default;
   }
 
-  Origin.set(target, new Origin(name, 'default'));
+  Origin.set(target, new Origin(moduleId, 'default'));
 
-  for (key in target) {
-    exportedValue = target[key];
+  if (typeof target === 'object') {
+    for (key in target) {
+      exportedValue = target[key];
 
-    if (typeof exportedValue === 'function') {
-      Origin.set(exportedValue, new Origin(name, key));
+      if (typeof exportedValue === 'function') {
+        Origin.set(exportedValue, new Origin(moduleId, key));
+      }
     }
   }
 
@@ -50,11 +52,18 @@ export let WebpackLoader = class WebpackLoader extends Loader {
     });
 
     PLATFORM.eachModule = callback => {
-      let registry = this.moduleRegistry;
+      let registry = __webpack_require__.c;
 
-      for (let key in registry) {
+      for (let moduleId in registry) {
+        if (typeof moduleId !== 'string') {
+          continue;
+        }
+        let moduleExports = registry[moduleId].exports;
+        if (typeof moduleExports !== 'object') {
+          continue;
+        }
         try {
-          if (callback(key, registry[key])) return;
+          if (callback(moduleId, moduleExports)) return;
         } catch (e) {}
       }
     };
@@ -70,6 +79,11 @@ export let WebpackLoader = class WebpackLoader extends Loader {
         if (loaderPlugin) {
           resolve(this.loaderPlugins[loaderPlugin].fetch(path));
         } else {
+          try {
+            const result = __webpack_require__(path);
+            resolve(result);
+            return;
+          } catch (_) {}
           require.ensure([], function (require) {
             const result = require('aurelia-loader-context/' + path);
             if (typeof result === 'function') {
@@ -114,17 +128,7 @@ export let WebpackLoader = class WebpackLoader extends Loader {
     if (existing) {
       return Promise.resolve(existing);
     }
-
-    return new Promise((resolve, reject) => {
-      try {
-        this._import(id).then(m => {
-          this.moduleRegistry[id] = m;
-          resolve(ensureOriginOnExports(m, id));
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return this._import(id).then(m => this.moduleRegistry[id] = ensureOriginOnExports(m, id));
   }
 
   loadTemplate(url) {

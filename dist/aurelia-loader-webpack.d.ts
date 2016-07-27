@@ -22,6 +22,7 @@ export declare class TextTemplateLoader {
     */
   loadTemplate(loader?: any, entry?: any): any;
 }
+export declare function ensureOriginOnExports(executed?: any, moduleId?: any): any;
 
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
