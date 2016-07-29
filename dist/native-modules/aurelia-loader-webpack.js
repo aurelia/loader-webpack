@@ -130,7 +130,7 @@ export var WebpackLoader = function (_Loader) {
         } catch (_) {}
         require.ensure([], function (require) {
           var result = require('aurelia-loader-context/' + path);
-          return this._getActualResult(result, resolve, reject);
+          return _this2._getActualResult(result, resolve, reject);
         }, 'app');
       }
     }).then(function (result) {

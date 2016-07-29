@@ -1,3 +1,13 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/aurelia/loader-webpack/compare/1.0.1...v1.0.2) (2016-07-29)
+
+
+### Bug Fixes
+
+* **index:** incorrect contextual "this" reference ([bf29b49](https://github.com/aurelia/loader-webpack/commit/bf29b49))
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/aurelia/loader-webpack/compare/1.0.0...v1.0.1) (2016-07-29)
 
