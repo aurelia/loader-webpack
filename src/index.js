@@ -87,10 +87,10 @@ export class WebpackLoader extends Loader {
       const isAsync = typeof result === 'function' && /cb\(__webpack_require__/.test(result.toString());
       if (!isAsync) {
         return resolve(result);
-      } else {
-        // because of async loading when the bundle loader is active
-        return result(actual => resolve(actual));
       }
+
+      // because of async loading when the bundle loader is active
+      return result(actual => resolve(actual));
     } catch (e) {
       reject(e);
     }
@@ -111,8 +111,7 @@ export class WebpackLoader extends Loader {
         } catch (e) {
           return reject(e);
         }
-      }
-      else {
+      } else {
         try {
           // first try native webpack method //
           const result = __webpack_require__(path);

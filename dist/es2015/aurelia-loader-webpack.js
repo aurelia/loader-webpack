@@ -41,6 +41,7 @@ export let WebpackLoader = class WebpackLoader extends Loader {
     this.moduleRegistry = Object.create(null);
     this.loaderPlugins = Object.create(null);
     this.useTemplateLoader(new TextTemplateLoader());
+    this.modulesBeingLoaded = Object.create(null);
 
     let that = this;
 
@@ -69,34 +70,50 @@ export let WebpackLoader = class WebpackLoader extends Loader {
     };
   }
 
+  _getActualResult(result, resolve, reject) {
+    try {
+      const isAsync = typeof result === 'function' && /cb\(__webpack_require__/.test(result.toString());
+      if (!isAsync) {
+        return resolve(result);
+      }
+
+      return result(actual => resolve(actual));
+    } catch (e) {
+      reject(e);
+    }
+  }
+
   _import(moduleId) {
+    if (this.modulesBeingLoaded[moduleId]) {
+      return this.modulesBeingLoaded[moduleId];
+    }
     const moduleIdParts = moduleId.split('!');
     const path = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
     const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
 
-    return new Promise((resolve, reject) => {
-      try {
-        if (loaderPlugin) {
-          resolve(this.loaderPlugins[loaderPlugin].fetch(path));
-        } else {
-          try {
-            const result = __webpack_require__(path);
-            resolve(result);
-            return;
-          } catch (_) {}
-          require.ensure([], function (require) {
-            const result = require('aurelia-loader-context/' + path);
-            if (typeof result === 'function') {
-              result(res => resolve(res));
-            } else {
-              resolve(result);
-            }
-          }, 'app');
+    const action = new Promise((resolve, reject) => {
+      if (loaderPlugin) {
+        try {
+          return resolve(this.loaderPlugins[loaderPlugin].fetch(path));
+        } catch (e) {
+          return reject(e);
         }
-      } catch (e) {
-        reject(e);
+      } else {
+        try {
+          const result = __webpack_require__(path);
+          return this._getActualResult(result, resolve, reject);
+        } catch (_) {}
+        require.ensure([], function (require) {
+          const result = require('aurelia-loader-context/' + path);
+          return this._getActualResult(result, resolve, reject);
+        }, 'app');
       }
+    }).then(result => {
+      this.modulesBeingLoaded[moduleId] = undefined;
+      return result;
     });
+    this.modulesBeingLoaded[moduleId] = action;
+    return action;
   }
 
   map(id, source) {}

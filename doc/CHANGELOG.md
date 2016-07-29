@@ -1,3 +1,13 @@
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/aurelia/loader-webpack/compare/1.0.0...v1.0.1) (2016-07-29)
+
+
+### Bug Fixes
+
+* **index:** cache loading Promises and fix lazy loading ([26e1a74](https://github.com/aurelia/loader-webpack/commit/26e1a74)), closes [#15](https://github.com/aurelia/loader-webpack/issues/15)
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-rc.1.0.0...v1.0.0) (2016-07-27)
 
