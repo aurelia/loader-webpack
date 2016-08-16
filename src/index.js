@@ -113,12 +113,15 @@ export class WebpackLoader extends Loader {
         }
       } else {
         try {
-          // first try native webpack method //
+          // first try native webpack method
           const result = __webpack_require__(path);
           return this._getActualResult(result, resolve, reject);
-        } catch (_) {}
+        } catch (_) {
+          // delete the cache
+          delete __webpack_require__.c[path];
+        }
         require.ensure([], require => {
-          // if failed, try resolving via the context created by the plugin //
+          // if failed, try resolving via the context created by the plugin
           const result = require('aurelia-loader-context/' + path);
           return this._getActualResult(result, resolve, reject);
         }, 'app');
