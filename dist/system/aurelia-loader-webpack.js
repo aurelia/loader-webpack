@@ -168,7 +168,9 @@ System.register(['aurelia-metadata', 'aurelia-loader', 'aurelia-pal'], function 
               try {
                 var result = __webpack_require__(path);
                 return _this2._getActualResult(result, resolve, reject);
-              } catch (_) {}
+              } catch (_) {
+                delete __webpack_require__.c[path];
+              }
               require.ensure([], function (require) {
                 var result = require('aurelia-loader-context/' + path);
                 return _this2._getActualResult(result, resolve, reject);

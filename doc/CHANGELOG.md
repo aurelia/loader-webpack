@@ -1,3 +1,13 @@
+<a name="1.0.3"></a>
+## [1.0.3](https://github.com/aurelia/loader-webpack/compare/1.0.2...v1.0.3) (2016-09-22)
+
+
+### Bug Fixes
+
+* **index:** delete the empty cache element if failed to __webpack_require__ ([13fb8b8](https://github.com/aurelia/loader-webpack/commit/13fb8b8)), closes [#18](https://github.com/aurelia/loader-webpack/issues/18)
+
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/aurelia/loader-webpack/compare/1.0.1...v1.0.2) (2016-07-29)
 

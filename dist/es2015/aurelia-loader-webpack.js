@@ -102,7 +102,9 @@ export let WebpackLoader = class WebpackLoader extends Loader {
         try {
           const result = __webpack_require__(path);
           return this._getActualResult(result, resolve, reject);
-        } catch (_) {}
+        } catch (_) {
+          delete __webpack_require__.c[path];
+        }
         require.ensure([], require => {
           const result = require('aurelia-loader-context/' + path);
           return this._getActualResult(result, resolve, reject);
