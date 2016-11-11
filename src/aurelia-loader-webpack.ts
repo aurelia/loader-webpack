@@ -123,7 +123,7 @@ export class WebpackLoader extends Loader {
 
   async _import(moduleId: string) {
     const moduleIdParts = moduleId.split('!');
-    const path = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
+    const modulePath = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
     const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
 
     if (loaderPlugin) {
@@ -131,19 +131,19 @@ export class WebpackLoader extends Loader {
       if (!plugin) {
         throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
       }
-      return await plugin.fetch(path);
+      return await plugin.fetch(modulePath);
     }
 
-    if (__webpack_require__.m[path]) {
-      return __webpack_require__(path);
+    if (__webpack_require__.m[modulePath]) {
+      return __webpack_require__(modulePath);
     }
 
-    if (__webpack_require__.m[`async!${path}`]) {
-      const callback = __webpack_require__(`async!${path}`) as (callback: (moduleExports: any) => void) => void;
+    if (__webpack_require__.m[`async!${modulePath}`]) {
+      const callback = __webpack_require__(`async!${modulePath}`) as (callback: (moduleExports: any) => void) => void;
       return await new Promise<any>(resolve => callback(resolve));
     }
 
-    throw new Error(`Unable to find module with ID: ${path}`);
+    throw new Error(`Unable to find module with ID: ${modulePath}`);
   }
 
   /**
