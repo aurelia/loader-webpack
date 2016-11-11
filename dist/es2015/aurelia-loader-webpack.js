@@ -1,3 +1,11 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+};
 import { Origin } from 'aurelia-metadata';
 import { Loader } from 'aurelia-loader';
 import { DOM, PLATFORM } from 'aurelia-pal';
@@ -12,13 +20,14 @@ export class TextTemplateLoader {
     * @return A promise which resolves when the TemplateRegistryEntry is loaded with a template.
     */
     loadTemplate(loader, entry) {
-        return loader.loadText(entry.address).then(text => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const text = yield loader.loadText(entry.address);
             entry.template = DOM.createTemplateFromMarkup(text);
         });
     }
 }
-export function ensureOriginOnExports(executed, moduleId) {
-    let target = executed;
+export function ensureOriginOnExports(moduleExports, moduleId) {
+    let target = moduleExports;
     let key;
     let exportedValue;
     if (target.__useDefault) {
@@ -33,7 +42,7 @@ export function ensureOriginOnExports(executed, moduleId) {
             }
         }
     }
-    return executed;
+    return moduleExports;
 }
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
@@ -43,84 +52,49 @@ export class WebpackLoader extends Loader {
         super();
         this.moduleRegistry = Object.create(null);
         this.loaderPlugins = Object.create(null);
+        this.modulesBeingLoaded = new Map();
         this.useTemplateLoader(new TextTemplateLoader());
-        this.modulesBeingLoaded = Object.create(null);
-        let that = this;
+        const loader = this;
         this.addPlugin('template-registry-entry', {
             'fetch': function (address) {
-                let entry = that.getOrCreateTemplateRegistryEntry(address);
-                return entry.templateIsLoaded ? entry : that.templateLoader.loadTemplate(that, entry).then(x => entry);
+                let entry = loader.getOrCreateTemplateRegistryEntry(address);
+                return entry.templateIsLoaded ? entry : loader.templateLoader.loadTemplate(loader, entry).then(() => entry);
             }
         });
         PLATFORM.eachModule = callback => {
-            let registry = __webpack_require__.c;
-            for (let moduleId in registry) {
-                if (typeof moduleId !== 'string') {
-                    continue;
+            const registry = __webpack_require__.c;
+            const cachedModuleIds = Object.getOwnPropertyNames(registry);
+            cachedModuleIds
+                .filter(moduleId => typeof moduleId === 'string')
+                .forEach(moduleId => {
+                const moduleExports = registry[moduleId].exports;
+                if (typeof moduleExports === 'object') {
+                    callback(moduleId, moduleExports);
                 }
-                let moduleExports = registry[moduleId].exports;
-                if (typeof moduleExports !== 'object') {
-                    continue;
-                }
-                try {
-                    if (callback(moduleId, moduleExports))
-                        return;
-                }
-                catch (e) { }
-            }
+            });
         };
     }
-    _getActualResult(result, resolve, reject) {
-        try {
-            const isAsync = typeof result === 'function' && /cb\(__webpack_require__/.test(result.toString());
-            if (!isAsync) {
-                return resolve(result);
-            }
-            // because of async loading when the bundle loader is active
-            return result(actual => resolve(actual));
-        }
-        catch (e) {
-            reject(e);
-        }
-    }
     _import(moduleId) {
-        if (this.modulesBeingLoaded[moduleId]) {
-            return this.modulesBeingLoaded[moduleId];
-        }
-        const moduleIdParts = moduleId.split('!');
-        const path = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
-        const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
-        const action = new Promise((resolve, reject) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const moduleIdParts = moduleId.split('!');
+            const modulePath = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
+            const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
             if (loaderPlugin) {
-                try {
-                    return resolve(this.loaderPlugins[loaderPlugin].fetch(path));
+                const plugin = this.loaderPlugins[loaderPlugin];
+                if (!plugin) {
+                    throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
                 }
-                catch (e) {
-                    return reject(e);
-                }
+                return yield plugin.fetch(modulePath);
             }
-            else {
-                try {
-                    // first try native webpack method
-                    const result = __webpack_require__(path);
-                    return this._getActualResult(result, resolve, reject);
-                }
-                catch (_) {
-                    // delete the cache
-                    delete __webpack_require__.c[path];
-                }
-                require.ensure([], require => {
-                    // if failed, try resolving via the context created by the plugin
-                    const result = require('aurelia-loader-context/' + path);
-                    return this._getActualResult(result, resolve, reject);
-                }, 'app');
+            if (__webpack_require__.m[modulePath]) {
+                return __webpack_require__(modulePath);
             }
-        }).then(result => {
-            this.modulesBeingLoaded[moduleId] = undefined;
-            return result;
+            if (__webpack_require__.m[`async!${modulePath}`]) {
+                const callback = __webpack_require__(`async!${modulePath}`);
+                return yield new Promise(resolve => callback(resolve));
+            }
+            throw new Error(`Unable to find module with ID: ${modulePath}`);
         });
-        this.modulesBeingLoaded[moduleId] = action;
-        return action;
     }
     /**
     * Maps a module id to a source.
@@ -159,23 +133,30 @@ export class WebpackLoader extends Loader {
     * @return A Promise for an array of loaded modules.
     */
     loadAllModules(ids) {
-        let loads = [];
-        for (let i = 0, ii = ids.length; i < ii; ++i) {
-            loads.push(this.loadModule(ids[i]));
-        }
-        return Promise.all(loads);
+        return Promise.all(ids.map(id => this.loadModule(id)));
     }
     /**
     * Loads a module.
-    * @param id The module id to normalize.
+    * @param moduleId The module ID to load.
     * @return A Promise for the loaded module.
     */
-    loadModule(id) {
-        let existing = this.moduleRegistry[id];
-        if (existing) {
-            return Promise.resolve(existing);
-        }
-        return this._import(id).then(m => this.moduleRegistry[id] = ensureOriginOnExports(m, id));
+    loadModule(moduleId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let existing = this.moduleRegistry[moduleId];
+            if (existing) {
+                return existing;
+            }
+            let beingLoaded = this.modulesBeingLoaded.get(moduleId);
+            if (beingLoaded) {
+                return beingLoaded;
+            }
+            beingLoaded = this._import(moduleId);
+            this.modulesBeingLoaded.set(moduleId, beingLoaded);
+            const moduleExports = yield beingLoaded;
+            this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
+            this.modulesBeingLoaded.delete(moduleId);
+            return moduleExports;
+        });
     }
     /**
     * Loads a template.
@@ -183,7 +164,7 @@ export class WebpackLoader extends Loader {
     * @return A Promise for a TemplateRegistryEntry containing the template.
     */
     loadTemplate(url) {
-        return this._import(this.applyPluginToUrl(url, 'template-registry-entry'));
+        return this.loadModule(this.applyPluginToUrl(url, 'template-registry-entry'));
     }
     /**
     * Loads a text-based resource.
@@ -191,7 +172,8 @@ export class WebpackLoader extends Loader {
     * @return A Promise for text content.
     */
     loadText(url) {
-        return this._import(url).then(result => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.loadModule(url);
             if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
                 // we're dealing with a file loaded using the css-loader:
                 return result.toString();
