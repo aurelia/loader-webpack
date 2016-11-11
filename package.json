@@ -20,10 +20,6 @@
     "url": "http://github.com/aurelia/loader-webpack"
   },
   "scripts": {
-    "lint": "tslint --project tsconfig.json",
-    "pretest": "npm run lint",
-    "test": "tsc && karma start --single-run",
-    "test-watch": "concurrently \"tsc --watch\" \"karma start\"",
     "build:compile": "aurelia-tools ts-build-all --continue-when-failed --clean-before",
     "build": "npm run build:compile",
     "postbuild": "npm run build:doc",
