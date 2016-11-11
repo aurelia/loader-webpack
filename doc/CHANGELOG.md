@@ -1,3 +1,22 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.3...v2.0.0) (2016-11-11)
+
+
+### Features
+
+* **all:** import by module names explicitly ([efc3f4d](https://github.com/aurelia/loader-webpack/commit/efc3f4d))
+
+
+### BREAKING CHANGES
+
+* all: this version of loader-webpack will not work with the webpack-plugin, and has to use the loaders and plugins available in the package: webpack-dependency-suite.
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/aurelia/loader-webpack/compare/1.0.2...v1.0.3) (2016-09-22)
 
