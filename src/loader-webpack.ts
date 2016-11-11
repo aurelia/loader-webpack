@@ -1,6 +1,49 @@
 import {Origin} from 'aurelia-metadata';
-import {Loader, TemplateRegistryEntry} from 'aurelia-loader';
+import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
 import {DOM, PLATFORM} from 'aurelia-pal';
+
+export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
+declare global {
+  const __webpack_require__: ((moduleId: string) => any) & {
+    /**
+     * require.ensure method
+     */
+    e: (chunkId: string) => Promise<any>;
+    /**
+     * Object containing available Webpack modules
+     */
+    m: { [name: string]: any; [number: number]: any; };
+    /**
+     * The module cache (already loaded modules)
+     */
+    c: { [name: string]: any; [number: number]: any; };
+    /**
+     * Identity function for calling harmory imports with the correct context
+     */
+    i: <T>(value: T) => T;
+    /**
+     * Define getter function for harmory exports
+     */
+    d: <T, Y extends () => any>(exports: T, name: string, getter: Y) => T & { name: Y };
+    /**
+     * getDefaultExport function for compatibility with non-harmony modules
+     */
+    n: (module: any) => any;
+    o: typeof Object.prototype.hasOwnProperty;
+    /**
+     * __webpack_public_path__
+     */
+    p: string;
+    /**
+     * on error function for async loading
+     */
+    oe: (err: Error) => void;
+    /**
+     * entry module ID
+     */
+    s: number | string;
+  };
+}
 
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
@@ -12,15 +55,14 @@ export class TextTemplateLoader {
   * @param entry The TemplateRegistryEntry to load and populate with a template.
   * @return A promise which resolves when the TemplateRegistryEntry is loaded with a template.
   */
-  loadTemplate(loader: Loader, entry: TemplateRegistryEntry) {
-    return loader.loadText(entry.address).then(text => {
-      entry.template = DOM.createTemplateFromMarkup(text);
-    });
+  async loadTemplate(loader: Loader, entry: TemplateRegistryEntry) {
+    const text = await loader.loadText(entry.address);
+    entry.template = DOM.createTemplateFromMarkup(text);
   }
 }
 
-export function ensureOriginOnExports(executed: any, moduleId: string) {
-  let target = executed;
+export function ensureOriginOnExports(moduleExports: any, moduleId: string) {
+  let target = moduleExports;
   let key;
   let exportedValue;
 
@@ -40,98 +82,68 @@ export function ensureOriginOnExports(executed: any, moduleId: string) {
     }
   }
 
-  return executed;
+  return moduleExports;
 }
 
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
 export class WebpackLoader extends Loader {
+  moduleRegistry = Object.create(null);
+  loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin };
+  modulesBeingLoaded = new Map<string, Promise<any>>();
+  templateLoader: TextTemplateLoader;
+
   constructor() {
     super();
 
-    this.moduleRegistry = Object.create(null);
-    this.loaderPlugins = Object.create(null);
     this.useTemplateLoader(new TextTemplateLoader());
-    this.modulesBeingLoaded = Object.create(null);
-
-    let that = this;
+    const loader = this;
 
     this.addPlugin('template-registry-entry', {
       'fetch': function(address) {
-        let entry = that.getOrCreateTemplateRegistryEntry(address);
-        return entry.templateIsLoaded ? entry : that.templateLoader.loadTemplate(that, entry).then(x => entry);
+        let entry = loader.getOrCreateTemplateRegistryEntry(address);
+        return entry.templateIsLoaded ? entry : loader.templateLoader.loadTemplate(loader, entry).then(() => entry);
       }
-    });
+    } as LoaderPlugin);
 
     PLATFORM.eachModule = callback => {
-      let registry = __webpack_require__.c;
-
-      for (let moduleId in registry) {
-        if (typeof moduleId !== 'string') {
-          continue;
-        }
-        let moduleExports = registry[moduleId].exports;
-        if (typeof moduleExports !== 'object') {
-          continue;
-        }
-        try {
-          if (callback(moduleId, moduleExports)) return;
-        } catch (e) {}
-      }
+      const registry = __webpack_require__.c;
+      const cachedModuleIds = Object.getOwnPropertyNames(registry);
+      cachedModuleIds
+        .filter(moduleId => typeof moduleId === 'string')
+        .forEach(moduleId => {
+          const moduleExports = registry[moduleId].exports;
+          if (typeof moduleExports === 'object') {
+            callback(moduleId, moduleExports);
+          }
+        })
     };
   }
 
-  _getActualResult(result, resolve, reject) {
-    try {
-      const isAsync = typeof result === 'function' && /cb\(__webpack_require__/.test(result.toString());
-      if (!isAsync) {
-        return resolve(result);
-      }
-
-      // because of async loading when the bundle loader is active
-      return result(actual => resolve(actual));
-    } catch (e) {
-      reject(e);
-    }
-  }
-
-  _import(moduleId) {
-    if (this.modulesBeingLoaded[moduleId]) {
-      return this.modulesBeingLoaded[moduleId];
-    }
+  async _import(moduleId: string) {
     const moduleIdParts = moduleId.split('!');
     const path = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
     const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
 
-    const action = new Promise((resolve, reject) => {
-      if (loaderPlugin) {
-        try {
-          return resolve(this.loaderPlugins[loaderPlugin].fetch(path));
-        } catch (e) {
-          return reject(e);
-        }
-      } else {
-        try {
-          // first try native webpack method
-          const result = __webpack_require__(path);
-          return this._getActualResult(result, resolve, reject);
-        } catch (_) {
-          // delete the cache
-          delete __webpack_require__.c[path];
-        }
-        require.ensure([], require => {
-          // if failed, try resolving via the context created by the plugin
-          const result = require('aurelia-loader-context/' + path);
-          return this._getActualResult(result, resolve, reject);
-        }, 'app');
+    if (loaderPlugin) {
+      const plugin = this.loaderPlugins[loaderPlugin];
+      if (!plugin) {
+        throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
       }
-    }).then(result => {
-      this.modulesBeingLoaded[moduleId] = undefined;
-      return result;
-    });
-    this.modulesBeingLoaded[moduleId] = action;
-    return action;
+      return await plugin.fetch(path);
+    }
+
+    if (__webpack_require__.m[path]) {
+      return __webpack_require__(path);
+    }
+
+    if (__webpack_require__.m[`async!${path}`]) {
+      const callback = __webpack_require__(`async!${path}`) as (callback: (moduleExports: any) => void) => void;
+      return await new Promise<any>(resolve => callback(resolve));
+    }
+
+    throw new Error(`Unable to find module with ID: ${path}`);
   }
 
   /**
@@ -139,7 +151,7 @@ export class WebpackLoader extends Loader {
   * @param id The module id.
   * @param source The source to map the module to.
   */
-  map(id, source) {}
+  map(id: string, source: any) {}
 
   /**
   * Normalizes a module id.
@@ -147,7 +159,7 @@ export class WebpackLoader extends Loader {
   * @param relativeTo What the module id should be normalized relative to.
   * @return The normalized module id.
   */
-  normalizeSync(moduleId, relativeTo) {
+  normalizeSync(moduleId: string, relativeTo: string) {
     return moduleId;
   }
 
@@ -157,7 +169,7 @@ export class WebpackLoader extends Loader {
   * @param relativeTo What the module id should be normalized relative to.
   * @return The normalized module id.
   */
-  normalize(moduleId, relativeTo) {
+  normalize(moduleId: string, relativeTo: string) {
     return Promise.resolve(moduleId);
   }
 
@@ -165,7 +177,7 @@ export class WebpackLoader extends Loader {
   * Instructs the loader to use a specific TemplateLoader instance for loading templates
   * @param templateLoader The instance of TemplateLoader to use for loading templates.
   */
-  useTemplateLoader(templateLoader) {
+  useTemplateLoader(templateLoader: TextTemplateLoader) {
     this.templateLoader = templateLoader;
   }
 
@@ -174,27 +186,32 @@ export class WebpackLoader extends Loader {
   * @param ids The set of module ids to load.
   * @return A Promise for an array of loaded modules.
   */
-  loadAllModules(ids) {
-    let loads = [];
-
-    for (let i = 0, ii = ids.length; i < ii; ++i) {
-      loads.push(this.loadModule(ids[i]));
-    }
-
-    return Promise.all(loads);
+  loadAllModules(ids: Array<string>) {
+    return Promise.all(
+      ids.map(id => this.loadModule(id))
+    );
   }
 
   /**
   * Loads a module.
-  * @param id The module id to normalize.
+  * @param moduleId The module ID to load.
   * @return A Promise for the loaded module.
   */
-  loadModule(id) {
-    let existing = this.moduleRegistry[id];
+  async loadModule(moduleId: string) {
+    let existing = this.moduleRegistry[moduleId];
     if (existing) {
-      return Promise.resolve(existing);
+      return existing;
     }
-    return this._import(id).then(m => this.moduleRegistry[id] = ensureOriginOnExports(m, id));
+    let beingLoaded = this.modulesBeingLoaded.get(moduleId);
+    if (beingLoaded) {
+      return beingLoaded;
+    }
+    beingLoaded = this._import(moduleId);
+    this.modulesBeingLoaded.set(moduleId, beingLoaded);
+    const moduleExports = await beingLoaded;
+    this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
+    this.modulesBeingLoaded.delete(moduleId);
+    return moduleExports;
   }
 
   /**
@@ -202,8 +219,8 @@ export class WebpackLoader extends Loader {
   * @param url The url of the template to load.
   * @return A Promise for a TemplateRegistryEntry containing the template.
   */
-  loadTemplate(url) {
-    return this._import(this.applyPluginToUrl(url, 'template-registry-entry'));
+  loadTemplate(url: string) {
+    return this.loadModule(this.applyPluginToUrl(url, 'template-registry-entry'));
   }
 
   /**
@@ -211,15 +228,13 @@ export class WebpackLoader extends Loader {
   * @param url The url of the text file to load.
   * @return A Promise for text content.
   */
-  loadText(url) {
-    return this._import(url).then(result => {
-      if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
-        // we're dealing with a file loaded using the css-loader:
-        return result.toString();
-      }
-
-      return result;
-    });
+  async loadText(url: string) {
+    const result = await this.loadModule(url);
+    if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+      // we're dealing with a file loaded using the css-loader:
+      return result.toString();
+    }
+    return result;
   }
 
   /**
@@ -228,7 +243,7 @@ export class WebpackLoader extends Loader {
   * @param pluginName The plugin to apply to the module id.
   * @return The plugin-based module id.
   */
-  applyPluginToUrl(url, pluginName) {
+  applyPluginToUrl(url: string, pluginName: string) {
     return `${pluginName}!${url}`;
   }
 
@@ -237,9 +252,9 @@ export class WebpackLoader extends Loader {
   * @param pluginName The name of the plugin.
   * @param implementation The plugin implementation.
   */
-  addPlugin(pluginName, implementation) {
+  addPlugin(pluginName: string, implementation: LoaderPlugin) {
     this.loaderPlugins[pluginName] = implementation;
   }
 }
 
-PLATFORM.Loader = WebpackLoader;
+(PLATFORM as any).Loader = WebpackLoader;
