@@ -1,25 +1,13 @@
 {
+  "extends": "./node_modules/aurelia-tools/tsc/tsconfig",
   "compilerOptions": {
-    "target": "es2015",
-    "module": "es2015",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
-    "moduleResolution": "node",
-    "stripInternal": true,
-    "preserveConstEnums": true,
-    "listFiles": true,
-    "declaration": true,
-    "removeComments": true,
-    "lib": ["es2015", "dom"]
+    "noUnusedParameters": false
   },
   "exclude": [
-    "node_modules",
+    ".vscode",
     "dist",
-    "build",
     "doc",
-    "test",
-    "config.js",
-    "gulpfile.js",
-    "karma.conf.js"
+    "node_modules",
+    "build"
   ]
 }
