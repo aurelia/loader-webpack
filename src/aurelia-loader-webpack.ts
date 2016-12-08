@@ -1,6 +1,9 @@
+/// <reference path="webpack-module.d.ts" />
+
 import {Origin} from 'aurelia-metadata';
 import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
 import {DOM, PLATFORM} from 'aurelia-pal';
+import {HmrContext} from 'aurelia-hot-module-reload';
 
 export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
 declare global {
@@ -90,20 +93,33 @@ export function ensureOriginOnExports(moduleExports: any, moduleId: string) {
 */
 export class WebpackLoader extends Loader {
   moduleRegistry = Object.create(null);
-  loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin };
+  loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin & { hot?: (moduleId: string) => void } };
   modulesBeingLoaded = new Map<string, Promise<any>>();
   templateLoader: TextTemplateLoader;
+  hmrContext: HmrContext;
 
   constructor() {
     super();
 
     this.useTemplateLoader(new TextTemplateLoader());
-    const loader = this;
 
     this.addPlugin('template-registry-entry', {
-      'fetch': function(address) {
-        let entry = loader.getOrCreateTemplateRegistryEntry(address);
-        return entry.templateIsLoaded ? entry : loader.templateLoader.loadTemplate(loader, entry).then(() => entry);
+      fetch: async (moduleId: string) => {
+        // HMR:
+        if (module.hot) {
+          if (!this.hmrContext) {
+            this.hmrContext = new HmrContext(this as any);
+          }
+          module.hot.accept(moduleId, async () => {
+            await this.hmrContext.handleViewChange(moduleId);
+          });
+        }
+
+        const entry = this.getOrCreateTemplateRegistryEntry(moduleId);
+        if (!entry.templateIsLoaded) {
+          await this.templateLoader.loadTemplate(this, entry);
+        }
+        return entry;
       }
     } as LoaderPlugin);
 
@@ -121,29 +137,47 @@ export class WebpackLoader extends Loader {
     };
   }
 
-  async _import(moduleId: string) {
-    const moduleIdParts = moduleId.split('!');
-    const modulePath = moduleIdParts.splice(moduleIdParts.length - 1, 1)[0];
-    const loaderPlugin = moduleIdParts.length === 1 ? moduleIdParts[0] : null;
+  async _import(address: string, defaultHMR = true) {
+    const addressParts = address.split('!');
+    const moduleId = addressParts.splice(addressParts.length - 1, 1)[0];
+    const loaderPlugin = addressParts.length === 1 ? addressParts[0] : null;
 
     if (loaderPlugin) {
       const plugin = this.loaderPlugins[loaderPlugin];
       if (!plugin) {
         throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
       }
-      return await plugin.fetch(modulePath);
+      if (module.hot && plugin.hot) {
+        module.hot.accept(moduleId, () => plugin.hot(moduleId));
+      }
+      return await plugin.fetch(moduleId);
     }
 
-    if (__webpack_require__.m[modulePath]) {
-      return __webpack_require__(modulePath);
+    if (__webpack_require__.m[moduleId]) {
+      if (defaultHMR && module.hot && this.hmrContext) {
+        module.hot.accept(moduleId, () => this.hmrContext.handleModuleChange(moduleId, module.hot));
+      }
+      return __webpack_require__(moduleId);
     }
 
-    if (__webpack_require__.m[`async!${modulePath}`]) {
-      const callback = __webpack_require__(`async!${modulePath}`) as (callback: (moduleExports: any) => void) => void;
-      return await new Promise<any>(resolve => callback(resolve));
+    const asyncModuleId = `async!${moduleId}`;
+
+    if (__webpack_require__.m[asyncModuleId]) {
+      if (defaultHMR && module.hot && this.hmrContext) {
+        module.hot.accept(moduleId, () => this.hmrContext.handleModuleChange(moduleId, module.hot));
+        module.hot.accept(asyncModuleId, () => {});
+      }
+      const callback = __webpack_require__(asyncModuleId) as (callback: (moduleExports: any) => void) => void;
+      return await new Promise<any>((resolve, reject) => {
+        try {
+          return callback(resolve);
+        } catch (e) {
+          reject(e);
+        }
+      });
     }
 
-    throw new Error(`Unable to find module with ID: ${modulePath}`);
+    throw new Error(`Unable to find module with ID: ${moduleId}`);
   }
 
   /**
@@ -197,7 +231,7 @@ export class WebpackLoader extends Loader {
   * @param moduleId The module ID to load.
   * @return A Promise for the loaded module.
   */
-  async loadModule(moduleId: string) {
+  async loadModule(moduleId: string, defaultHMR = true) {
     let existing = this.moduleRegistry[moduleId];
     if (existing) {
       return existing;
@@ -206,7 +240,7 @@ export class WebpackLoader extends Loader {
     if (beingLoaded) {
       return beingLoaded;
     }
-    beingLoaded = this._import(moduleId);
+    beingLoaded = this._import(moduleId, defaultHMR);
     this.modulesBeingLoaded.set(moduleId, beingLoaded);
     const moduleExports = await beingLoaded;
     this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
@@ -220,7 +254,7 @@ export class WebpackLoader extends Loader {
   * @return A Promise for a TemplateRegistryEntry containing the template.
   */
   loadTemplate(url: string) {
-    return this.loadModule(this.applyPluginToUrl(url, 'template-registry-entry'));
+    return this.loadModule(this.applyPluginToUrl(url, 'template-registry-entry'), false);
   }
 
   /**
@@ -229,7 +263,7 @@ export class WebpackLoader extends Loader {
   * @return A Promise for text content.
   */
   async loadText(url: string) {
-    const result = await this.loadModule(url);
+    const result = await this.loadModule(url, false);
     if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
       // we're dealing with a file loaded using the css-loader:
       return result.toString();
