@@ -84,7 +84,6 @@ export class WebpackLoader extends Loader {
       const registry = __webpack_require__.c;
       const cachedModuleIds = Object.getOwnPropertyNames(registry);
       cachedModuleIds
-        .filter(moduleId => typeof moduleId === 'string')
         .forEach(moduleId => {
           const moduleExports = registry[moduleId].exports;
           if (typeof moduleExports === 'object') {
