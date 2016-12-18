@@ -146,7 +146,7 @@ export class WebpackLoader extends Loader {
         throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
       }
       if (module.hot && plugin.hot) {
-        module.hot.accept(moduleId, () => plugin.hot(moduleId));
+        module.hot.accept(moduleId, () => plugin.hot!(moduleId));
       }
       return await plugin.fetch(moduleId);
     }
