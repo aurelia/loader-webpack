@@ -124,7 +124,7 @@ export class WebpackLoader extends Loader {
         module.hot.accept(asyncModuleId, () => {});
       }
       const callback = __webpack_require__(asyncModuleId) as (callback: (moduleExports: any) => void) => void;
-      return await new Promise(resolve => callback(resolve));
+      return await new Promise(callback);
     }
 
     throw new Error(`Unable to find module with ID: ${moduleId}`);
