@@ -1,5 +1,3 @@
-/// <reference path="webpack-module.d.ts" />
-
 import {Origin} from 'aurelia-metadata';
 import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
 import {DOM, PLATFORM} from 'aurelia-pal';
