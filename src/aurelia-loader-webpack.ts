@@ -1,52 +1,9 @@
-/// <reference path="webpack-module.d.ts" />
-
 import {Origin} from 'aurelia-metadata';
 import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
 import {DOM, PLATFORM} from 'aurelia-pal';
 import {HmrContext} from 'aurelia-hot-module-reload';
 
 export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
-declare global {
-  const __webpack_require__: ((moduleId: string) => any) & {
-    /**
-     * require.ensure method
-     */
-    e: (chunkId: string) => Promise<any>;
-    /**
-     * Object containing available Webpack modules
-     */
-    m: { [name: string]: any; [number: number]: any; };
-    /**
-     * The module cache (already loaded modules)
-     */
-    c: { [name: string]: any; [number: number]: any; };
-    /**
-     * Identity function for calling harmory imports with the correct context
-     */
-    i: <T>(value: T) => T;
-    /**
-     * Define getter function for harmory exports
-     */
-    d: <T, Y extends () => any>(exports: T, name: string, getter: Y) => T & { name: Y };
-    /**
-     * getDefaultExport function for compatibility with non-harmony modules
-     */
-    n: (module: any) => any;
-    o: typeof Object.prototype.hasOwnProperty;
-    /**
-     * __webpack_public_path__
-     */
-    p: string;
-    /**
-     * on error function for async loading
-     */
-    oe: (err: Error) => void;
-    /**
-     * entry module ID
-     */
-    s: number | string;
-  };
-}
 
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
@@ -127,7 +84,6 @@ export class WebpackLoader extends Loader {
       const registry = __webpack_require__.c;
       const cachedModuleIds = Object.getOwnPropertyNames(registry);
       cachedModuleIds
-        .filter(moduleId => typeof moduleId === 'string')
         .forEach(moduleId => {
           const moduleExports = registry[moduleId].exports;
           if (typeof moduleExports === 'object') {
@@ -148,7 +104,7 @@ export class WebpackLoader extends Loader {
         throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
       }
       if (module.hot && plugin.hot) {
-        module.hot.accept(moduleId, () => plugin.hot(moduleId));
+        module.hot.accept(moduleId, () => plugin.hot!(moduleId));
       }
       return await plugin.fetch(moduleId);
     }
@@ -168,13 +124,7 @@ export class WebpackLoader extends Loader {
         module.hot.accept(asyncModuleId, () => {});
       }
       const callback = __webpack_require__(asyncModuleId) as (callback: (moduleExports: any) => void) => void;
-      return await new Promise<any>((resolve, reject) => {
-        try {
-          return callback(resolve);
-        } catch (e) {
-          reject(e);
-        }
-      });
+      return await new Promise(callback);
     }
 
     throw new Error(`Unable to find module with ID: ${moduleId}`);
