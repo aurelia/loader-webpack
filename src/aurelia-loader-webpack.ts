@@ -1,7 +1,6 @@
 import {Origin} from 'aurelia-metadata';
 import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
 import {DOM, PLATFORM} from 'aurelia-pal';
-import {HmrContext} from 'aurelia-hot-module-reload';
 
 export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
 
@@ -53,7 +52,10 @@ export class WebpackLoader extends Loader {
   loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin & { hot?: (moduleId: string) => void } };
   modulesBeingLoaded = new Map<string, Promise<any>>();
   templateLoader: TextTemplateLoader;
-  hmrContext: HmrContext;
+  hmrContext: { 
+    handleModuleChange(moduleId: string, hot: Webpack.WebpackHotModule): Promise<void>,
+    handleViewChange(moduleId: string): Promise<void>
+  };
 
   constructor() {
     super();
@@ -65,6 +67,11 @@ export class WebpackLoader extends Loader {
         // HMR:
         if (module.hot) {
           if (!this.hmrContext) {
+            // Note: Please do NOT import aurelia-hot-module-reload statically at the top of file.
+            //       We don't want to bundle it when not using --hot, in particular in production builds.
+            //       Webpack will evaluate the `if (module.hot)` above at build time 
+            //       and will include (or not) aurelia-hot-module-reload accordingly.
+            const { HmrContext } = require('aurelia-hot-module-reload');
             this.hmrContext = new HmrContext(this as any);
           }
           module.hot.accept(moduleId, async () => {
