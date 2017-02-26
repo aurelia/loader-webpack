@@ -1,8 +1,6 @@
-/// <reference path="webpack-module.d.ts" />
 import { Origin } from 'aurelia-metadata';
 import { Loader } from 'aurelia-loader';
 import { DOM, PLATFORM } from 'aurelia-pal';
-import { HmrContext } from 'aurelia-hot-module-reload';
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
@@ -51,6 +49,11 @@ export class WebpackLoader extends Loader {
                 // HMR:
                 if (module.hot) {
                     if (!this.hmrContext) {
+                        // Note: Please do NOT import aurelia-hot-module-reload statically at the top of file.
+                        //       We don't want to bundle it when not using --hot, in particular in production builds.
+                        //       Webpack will evaluate the `if (module.hot)` above at build time 
+                        //       and will include (or not) aurelia-hot-module-reload accordingly.
+                        const { HmrContext } = require('aurelia-hot-module-reload');
                         this.hmrContext = new HmrContext(this);
                     }
                     module.hot.accept(moduleId, async () => {
@@ -68,7 +71,6 @@ export class WebpackLoader extends Loader {
             const registry = __webpack_require__.c;
             const cachedModuleIds = Object.getOwnPropertyNames(registry);
             cachedModuleIds
-                .filter(moduleId => typeof moduleId === 'string')
                 .forEach(moduleId => {
                 const moduleExports = registry[moduleId].exports;
                 if (typeof moduleExports === 'object') {
@@ -104,14 +106,7 @@ export class WebpackLoader extends Loader {
                 module.hot.accept(asyncModuleId, () => { });
             }
             const callback = __webpack_require__(asyncModuleId);
-            return await new Promise((resolve, reject) => {
-                try {
-                    return callback(resolve);
-                }
-                catch (e) {
-                    reject(e);
-                }
-            });
+            return await new Promise(callback);
         }
         throw new Error(`Unable to find module with ID: ${moduleId}`);
     }

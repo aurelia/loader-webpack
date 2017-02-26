@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "aurelia-metadata", "aurelia-loader", "aurelia-pal"], function (require, exports, aurelia_metadata_1, aurelia_loader_1, aurelia_pal_1) {
+define("aurelia-loader-webpack", ["require", "exports", "aurelia-metadata", "aurelia-loader", "aurelia-pal"], function (require, exports, aurelia_metadata_1, aurelia_loader_1, aurelia_pal_1) {
     "use strict";
     /**
     * An implementation of the TemplateLoader interface implemented with text-based loading.

@@ -1,58 +1,7 @@
-/// <reference path="../../src/webpack-module.d.ts" />
 import { Loader, TemplateRegistryEntry, LoaderPlugin } from 'aurelia-loader';
-import { HmrContext } from 'aurelia-hot-module-reload';
 export declare type LoaderPlugin = {
     fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry;
 };
-declare global  {
-    const __webpack_require__: ((moduleId: string) => any) & {
-        /**
-         * require.ensure method
-         */
-        e: (chunkId: string) => Promise<any>;
-        /**
-         * Object containing available Webpack modules
-         */
-        m: {
-            [name: string]: any;
-            [number: number]: any;
-        };
-        /**
-         * The module cache (already loaded modules)
-         */
-        c: {
-            [name: string]: any;
-            [number: number]: any;
-        };
-        /**
-         * Identity function for calling harmory imports with the correct context
-         */
-        i: <T>(value: T) => T;
-        /**
-         * Define getter function for harmory exports
-         */
-        d: <T, Y extends () => any>(exports: T, name: string, getter: Y) => T & {
-            name: Y;
-        };
-        /**
-         * getDefaultExport function for compatibility with non-harmony modules
-         */
-        n: (module: any) => any;
-        o: typeof Object.prototype.hasOwnProperty;
-        /**
-         * __webpack_public_path__
-         */
-        p: string;
-        /**
-         * on error function for async loading
-         */
-        oe: (err: Error) => void;
-        /**
-         * entry module ID
-         */
-        s: number | string;
-    };
-}
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
@@ -78,7 +27,10 @@ export declare class WebpackLoader extends Loader {
     };
     modulesBeingLoaded: Map<string, Promise<any>>;
     templateLoader: TextTemplateLoader;
-    hmrContext: HmrContext;
+    hmrContext: {
+        handleModuleChange(moduleId: string, hot: Webpack.WebpackHotModule): Promise<void>;
+        handleViewChange(moduleId: string): Promise<void>;
+    };
     constructor();
     _import(address: string, defaultHMR?: boolean): Promise<any>;
     /**

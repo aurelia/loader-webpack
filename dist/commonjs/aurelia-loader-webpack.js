@@ -1,4 +1,3 @@
-/// <reference path="webpack-module.d.ts" />
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments)).next());
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
@@ -43,7 +42,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var aurelia_metadata_1 = require("aurelia-metadata");
 var aurelia_loader_1 = require("aurelia-loader");
 var aurelia_pal_1 = require("aurelia-pal");
-var aurelia_hot_module_reload_1 = require("aurelia-hot-module-reload");
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
@@ -106,14 +104,15 @@ var WebpackLoader = (function (_super) {
         _this.addPlugin('template-registry-entry', {
             fetch: function (moduleId) { return __awaiter(_this, void 0, void 0, function () {
                 var _this = this;
-                var entry;
+                var HmrContext, entry;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             // HMR:
                             if (module.hot) {
                                 if (!this.hmrContext) {
-                                    this.hmrContext = new aurelia_hot_module_reload_1.HmrContext(this);
+                                    HmrContext = require('aurelia-hot-module-reload').HmrContext;
+                                    this.hmrContext = new HmrContext(this);
                                 }
                                 module.hot.accept(moduleId, function () { return __awaiter(_this, void 0, void 0, function () {
                                     return __generator(this, function (_a) {
@@ -127,8 +126,7 @@ var WebpackLoader = (function (_super) {
                                 }); });
                             }
                             entry = this.getOrCreateTemplateRegistryEntry(moduleId);
-                            if (!!entry.templateIsLoaded)
-                                return [3 /*break*/, 2];
+                            if (!!entry.templateIsLoaded) return [3 /*break*/, 2];
                             return [4 /*yield*/, this.templateLoader.loadTemplate(this, entry)];
                         case 1:
                             _a.sent();
@@ -142,7 +140,6 @@ var WebpackLoader = (function (_super) {
             var registry = __webpack_require__.c;
             var cachedModuleIds = Object.getOwnPropertyNames(registry);
             cachedModuleIds
-                .filter(function (moduleId) { return typeof moduleId === 'string'; })
                 .forEach(function (moduleId) {
                 var moduleExports = registry[moduleId].exports;
                 if (typeof moduleExports === 'object') {
@@ -156,15 +153,14 @@ var WebpackLoader = (function (_super) {
         if (defaultHMR === void 0) { defaultHMR = true; }
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var addressParts, moduleId, loaderPlugin, plugin_1, asyncModuleId, callback_1;
+            var addressParts, moduleId, loaderPlugin, plugin_1, asyncModuleId, callback;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         addressParts = address.split('!');
                         moduleId = addressParts.splice(addressParts.length - 1, 1)[0];
                         loaderPlugin = addressParts.length === 1 ? addressParts[0] : null;
-                        if (!loaderPlugin)
-                            return [3 /*break*/, 2];
+                        if (!loaderPlugin) return [3 /*break*/, 2];
                         plugin_1 = this.loaderPlugins[loaderPlugin];
                         if (!plugin_1) {
                             throw new Error("Plugin " + loaderPlugin + " is not registered in the loader.");
@@ -182,21 +178,13 @@ var WebpackLoader = (function (_super) {
                             return [2 /*return*/, __webpack_require__(moduleId)];
                         }
                         asyncModuleId = "async!" + moduleId;
-                        if (!__webpack_require__.m[asyncModuleId])
-                            return [3 /*break*/, 4];
+                        if (!__webpack_require__.m[asyncModuleId]) return [3 /*break*/, 4];
                         if (defaultHMR && module.hot && this.hmrContext) {
                             module.hot.accept(moduleId, function () { return _this.hmrContext.handleModuleChange(moduleId, module.hot); });
                             module.hot.accept(asyncModuleId, function () { });
                         }
-                        callback_1 = __webpack_require__(asyncModuleId);
-                        return [4 /*yield*/, new Promise(function (resolve, reject) {
-                                try {
-                                    return callback_1(resolve);
-                                }
-                                catch (e) {
-                                    reject(e);
-                                }
-                            })];
+                        callback = __webpack_require__(asyncModuleId);
+                        return [4 /*yield*/, new Promise(callback)];
                     case 3: return [2 /*return*/, _a.sent()];
                     case 4: throw new Error("Unable to find module with ID: " + moduleId);
                 }
