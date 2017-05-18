@@ -17,7 +17,7 @@ export class TextTemplateLoader {
   loadTemplate(loader: Loader, entry: TemplateRegistryEntry) {
     return loader.loadText(entry.address).then((text) => {
       entry.template = DOM.createTemplateFromMarkup(text);
-    })
+    });
   }
 }
 
@@ -76,17 +76,13 @@ export class WebpackLoader extends Loader {
             this.hmrContext = new HmrContext(this as any);
           }
           module.hot.accept(moduleId,  () => {
-            return this.hmrContext.handleViewChange(moduleId).then((resource) => {
-              return resource;
-            });
+            return this.hmrContext.handleViewChange(moduleId);
           });
         }
 
         const entry = this.getOrCreateTemplateRegistryEntry(moduleId);
         if (!entry.templateIsLoaded) {
-          return this.templateLoader.loadTemplate(this, entry).then(() => {
-            return entry;
-          });
+          return this.templateLoader.loadTemplate(this, entry).then(() => entry);
         }
         return Promise.resolve(entry);
       }
@@ -118,9 +114,7 @@ export class WebpackLoader extends Loader {
       if (module.hot && plugin.hot) {
         module.hot.accept(moduleId, () => plugin.hot!(moduleId));
       }
-      return plugin.fetch(moduleId).then((resource) => {
-        return resource;
-      });
+      return plugin.fetch(moduleId);
     }
 
     if (__webpack_require__.m[moduleId]) {
@@ -206,12 +200,11 @@ export class WebpackLoader extends Loader {
     }
     beingLoaded = this._import(moduleId, defaultHMR);
     this.modulesBeingLoaded.set(moduleId, beingLoaded);
-    // const moduleExports = await beingLoaded;
-    return beingLoaded.then((moduleExports) => {
+    return beingLoaded.then(moduleExports => {
       this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
       this.modulesBeingLoaded.delete(moduleId);
       return moduleExports;
-    })
+    });
   }
 
   /**
@@ -229,13 +222,13 @@ export class WebpackLoader extends Loader {
   * @return A Promise for text content.
   */
   loadText(url: string) {
-    return this.loadModule(url,false).then((result) => {
+    return this.loadModule(url, false).then((result) => {
       if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
         // we're dealing with a file loaded using the css-loader:
         return result.toString();
       }
       return result;
-    })
+    });
   }
 
   /**
