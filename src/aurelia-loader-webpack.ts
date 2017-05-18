@@ -14,9 +14,10 @@ export class TextTemplateLoader {
   * @param entry The TemplateRegistryEntry to load and populate with a template.
   * @return A promise which resolves when the TemplateRegistryEntry is loaded with a template.
   */
-  async loadTemplate(loader: Loader, entry: TemplateRegistryEntry) {
-    const text = await loader.loadText(entry.address);
-    entry.template = DOM.createTemplateFromMarkup(text);
+  loadTemplate(loader: Loader, entry: TemplateRegistryEntry) {
+    return loader.loadText(entry.address).then((text) => {
+      entry.template = DOM.createTemplateFromMarkup(text);
+    })
   }
 }
 
@@ -52,7 +53,7 @@ export class WebpackLoader extends Loader {
   loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin & { hot?: (moduleId: string) => void } };
   modulesBeingLoaded = new Map<string, Promise<any>>();
   templateLoader: TextTemplateLoader;
-  hmrContext: { 
+  hmrContext: {
     handleModuleChange(moduleId: string, hot: Webpack.WebpackHotModule): Promise<void>,
     handleViewChange(moduleId: string): Promise<void>
   };
@@ -63,27 +64,31 @@ export class WebpackLoader extends Loader {
     this.useTemplateLoader(new TextTemplateLoader());
 
     this.addPlugin('template-registry-entry', {
-      fetch: async (moduleId: string) => {
+      fetch: (moduleId: string) => {
         // HMR:
         if (module.hot) {
           if (!this.hmrContext) {
             // Note: Please do NOT import aurelia-hot-module-reload statically at the top of file.
             //       We don't want to bundle it when not using --hot, in particular in production builds.
-            //       Webpack will evaluate the `if (module.hot)` above at build time 
+            //       Webpack will evaluate the `if (module.hot)` above at build time
             //       and will include (or not) aurelia-hot-module-reload accordingly.
             const { HmrContext } = require('aurelia-hot-module-reload');
             this.hmrContext = new HmrContext(this as any);
           }
-          module.hot.accept(moduleId, async () => {
-            await this.hmrContext.handleViewChange(moduleId);
+          module.hot.accept(moduleId,  () => {
+            return this.hmrContext.handleViewChange(moduleId).then((resource) => {
+              return resource;
+            });
           });
         }
 
         const entry = this.getOrCreateTemplateRegistryEntry(moduleId);
         if (!entry.templateIsLoaded) {
-          await this.templateLoader.loadTemplate(this, entry);
+          return this.templateLoader.loadTemplate(this, entry).then(() => {
+            return entry;
+          });
         }
-        return entry;
+        return Promise.resolve(entry);
       }
     } as LoaderPlugin);
 
@@ -100,7 +105,7 @@ export class WebpackLoader extends Loader {
     };
   }
 
-  async _import(address: string, defaultHMR = true) {
+  _import(address: string, defaultHMR = true) {
     const addressParts = address.split('!');
     const moduleId = addressParts.splice(addressParts.length - 1, 1)[0];
     const loaderPlugin = addressParts.length === 1 ? addressParts[0] : null;
@@ -108,19 +113,21 @@ export class WebpackLoader extends Loader {
     if (loaderPlugin) {
       const plugin = this.loaderPlugins[loaderPlugin];
       if (!plugin) {
-        throw new Error(`Plugin ${loaderPlugin} is not registered in the loader.`);
+        return Promise.reject(new Error(`Plugin ${loaderPlugin} is not registered in the loader.`));
       }
       if (module.hot && plugin.hot) {
         module.hot.accept(moduleId, () => plugin.hot!(moduleId));
       }
-      return await plugin.fetch(moduleId);
+      return plugin.fetch(moduleId).then((resource) => {
+        return resource;
+      });
     }
 
     if (__webpack_require__.m[moduleId]) {
       if (defaultHMR && module.hot && this.hmrContext) {
         module.hot.accept(moduleId, () => this.hmrContext.handleModuleChange(moduleId, module.hot));
       }
-      return __webpack_require__(moduleId);
+      return Promise.resolve(__webpack_require__(moduleId));
     }
 
     const asyncModuleId = `async!${moduleId}`;
@@ -131,10 +138,10 @@ export class WebpackLoader extends Loader {
         module.hot.accept(asyncModuleId, () => {});
       }
       const callback = __webpack_require__(asyncModuleId) as (callback: (moduleExports: any) => void) => void;
-      return await new Promise(callback);
+      return new Promise(callback);
     }
 
-    throw new Error(`Unable to find module with ID: ${moduleId}`);
+    return Promise.reject(new Error(`Unable to find module with ID: ${moduleId}`));
   }
 
   /**
@@ -188,10 +195,10 @@ export class WebpackLoader extends Loader {
   * @param moduleId The module ID to load.
   * @return A Promise for the loaded module.
   */
-  async loadModule(moduleId: string, defaultHMR = true) {
+  loadModule(moduleId: string, defaultHMR = true) {
     let existing = this.moduleRegistry[moduleId];
     if (existing) {
-      return existing;
+      return Promise.resolve(existing);
     }
     let beingLoaded = this.modulesBeingLoaded.get(moduleId);
     if (beingLoaded) {
@@ -199,10 +206,12 @@ export class WebpackLoader extends Loader {
     }
     beingLoaded = this._import(moduleId, defaultHMR);
     this.modulesBeingLoaded.set(moduleId, beingLoaded);
-    const moduleExports = await beingLoaded;
-    this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
-    this.modulesBeingLoaded.delete(moduleId);
-    return moduleExports;
+    // const moduleExports = await beingLoaded;
+    return beingLoaded.then((moduleExports) => {
+      this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
+      this.modulesBeingLoaded.delete(moduleId);
+      return moduleExports;
+    })
   }
 
   /**
@@ -219,13 +228,14 @@ export class WebpackLoader extends Loader {
   * @param url The url of the text file to load.
   * @return A Promise for text content.
   */
-  async loadText(url: string) {
-    const result = await this.loadModule(url, false);
-    if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
-      // we're dealing with a file loaded using the css-loader:
-      return result.toString();
-    }
-    return result;
+  loadText(url: string) {
+    return this.loadModule(url,false).then((result) => {
+      if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+        // we're dealing with a file loaded using the css-loader:
+        return result.toString();
+      }
+      return result;
+    })
   }
 
   /**
