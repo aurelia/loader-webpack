@@ -29,7 +29,7 @@
     "release": "aurelia-tools changelog"
   },
   "dependencies": {
-    "aurelia-hot-module-reload": "^0.1.0",
+    "aurelia-hot-module-reload": "^0.2.0",
     "aurelia-loader": "^1.0.0",
     "aurelia-metadata": "^1.0.2",
     "aurelia-pal": "^1.1.1"
