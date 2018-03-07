@@ -128,7 +128,7 @@ export class WebpackLoader extends Loader {
     if (__webpack_require__.m[asyncModuleId]) {
       if (defaultHMR && module.hot && this.hmrContext) {
         module.hot.accept(moduleId, () => this.hmrContext.handleModuleChange(moduleId, module.hot));
-        module.hot.accept(asyncModuleId, () => {});
+        module.hot.accept(asyncModuleId, () => this.hmrContext.handleModuleChange(moduleId, module.hot));
       }
       const callback = __webpack_require__(asyncModuleId) as (callback: (moduleExports: any) => void) => void;
       return await new Promise(callback);
