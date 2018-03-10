@@ -91,12 +91,13 @@ export class WebpackLoader extends Loader {
       const registry = __webpack_require__.c;
       const cachedModuleIds = Object.getOwnPropertyNames(registry);
       cachedModuleIds
-        .forEach(moduleId => {
+        .some(moduleId => {
           const moduleExports = registry[moduleId].exports;
           if (typeof moduleExports === 'object') {
-            callback(moduleId, moduleExports);
+            return callback(moduleId, moduleExports);
           }
-        })
+          return false;
+        });
     };
   }
 
