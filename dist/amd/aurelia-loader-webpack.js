@@ -179,7 +179,7 @@ define(["require", "exports", "aurelia-metadata", "aurelia-loader", "aurelia-pal
                             if (!__webpack_require__.m[asyncModuleId]) return [3 /*break*/, 4];
                             if (defaultHMR && module.hot && this.hmrContext) {
                                 module.hot.accept(moduleId, function () { return _this.hmrContext.handleModuleChange(moduleId, module.hot); });
-                                module.hot.accept(asyncModuleId, function () { });
+                                module.hot.accept(asyncModuleId, function () { return _this.hmrContext.handleModuleChange(moduleId, module.hot); });
                             }
                             callback = __webpack_require__(asyncModuleId);
                             return [4 /*yield*/, new Promise(callback)];
