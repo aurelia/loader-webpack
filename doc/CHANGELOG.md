@@ -1,3 +1,18 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="2.2.1"></a>
+## [2.2.1](https://github.com/aurelia/loader-webpack/compare/2.1.0...2.2.1) (2018-06-19)
+
+
+### Bug Fixes
+
+* **eachModule:** shortcircuit the iteration when callback returns true ([d5a6d73](https://github.com/aurelia/loader-webpack/commit/d5a6d73))
+* **loader-webpack:** handle HMR changes also in async modules ([#40](https://github.com/aurelia/loader-webpack/issues/40)) ([36c5de3](https://github.com/aurelia/loader-webpack/commit/36c5de3))
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/aurelia/loader-webpack/compare/1.0.2...v1.0.3) (2016-09-22)
 
