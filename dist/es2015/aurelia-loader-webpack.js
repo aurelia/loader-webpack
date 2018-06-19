@@ -81,11 +81,16 @@ export class WebpackLoader extends Loader {
             const registry = __webpack_require__.c;
             const cachedModuleIds = Object.getOwnPropertyNames(registry);
             cachedModuleIds
-                .forEach(moduleId => {
+                // Note: we use .some here like a .forEach that can be "break"ed out of.
+                // It will stop iterating only when a truthy value is returned.
+                // Even though the docs say "true" explicitly, loader-default also goes by truthy
+                // and this is to keep it consistent with that.
+                .some(moduleId => {
                 const moduleExports = registry[moduleId].exports;
                 if (typeof moduleExports === 'object') {
-                    callback(moduleId, moduleExports);
+                    return callback(moduleId, moduleExports);
                 }
+                return false;
             });
         };
     }

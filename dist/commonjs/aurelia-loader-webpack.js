@@ -1,9 +1,14 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -13,14 +18,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
-    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -39,13 +44,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 var aurelia_metadata_1 = require("aurelia-metadata");
 var aurelia_loader_1 = require("aurelia-loader");
 var aurelia_pal_1 = require("aurelia-pal");
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
-var TextTemplateLoader = (function () {
+var TextTemplateLoader = /** @class */ (function () {
     function TextTemplateLoader() {
     }
     /**
@@ -93,7 +99,7 @@ exports.ensureOriginOnExports = ensureOriginOnExports;
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
-var WebpackLoader = (function (_super) {
+var WebpackLoader = /** @class */ (function (_super) {
     __extends(WebpackLoader, _super);
     function WebpackLoader() {
         var _this = _super.call(this) || this;
@@ -103,8 +109,8 @@ var WebpackLoader = (function (_super) {
         _this.useTemplateLoader(new TextTemplateLoader());
         _this.addPlugin('template-registry-entry', {
             fetch: function (moduleId) { return __awaiter(_this, void 0, void 0, function () {
-                var _this = this;
                 var HmrContext, entry;
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -140,11 +146,16 @@ var WebpackLoader = (function (_super) {
             var registry = __webpack_require__.c;
             var cachedModuleIds = Object.getOwnPropertyNames(registry);
             cachedModuleIds
-                .forEach(function (moduleId) {
+                // Note: we use .some here like a .forEach that can be "break"ed out of.
+                // It will stop iterating only when a truthy value is returned.
+                // Even though the docs say "true" explicitly, loader-default also goes by truthy
+                // and this is to keep it consistent with that.
+                .some(function (moduleId) {
                 var moduleExports = registry[moduleId].exports;
                 if (typeof moduleExports === 'object') {
-                    callback(moduleId, moduleExports);
+                    return callback(moduleId, moduleExports);
                 }
+                return false;
             });
         };
         return _this;
@@ -152,8 +163,8 @@ var WebpackLoader = (function (_super) {
     WebpackLoader.prototype._import = function (address, defaultHMR) {
         if (defaultHMR === void 0) { defaultHMR = true; }
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             var addressParts, moduleId, loaderPlugin, plugin_1, asyncModuleId, callback;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
