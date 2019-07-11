@@ -89,31 +89,9 @@ async@~0.2.6:
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
 
-aurelia-binding@^1.0.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/aurelia-binding/-/aurelia-binding-1.1.0.tgz#4c0d5c5e7f5276afef2dce349a74328f71843769"
-  dependencies:
-    aurelia-logging "^1.0.0"
-    aurelia-metadata "^1.0.0"
-    aurelia-pal "^1.0.0"
-    aurelia-task-queue "^1.0.0"
-
-aurelia-dependency-injection@^1.0.0, aurelia-dependency-injection@^1.2.0:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/aurelia-dependency-injection/-/aurelia-dependency-injection-1.2.1.tgz#832cae00e1fae9b0c197b41d491be44fe855009b"
-  dependencies:
-    aurelia-metadata "^1.0.0"
-    aurelia-pal "^1.0.0"
-
-aurelia-hot-module-reload@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/aurelia-hot-module-reload/-/aurelia-hot-module-reload-0.1.0.tgz#fc39d5157a1c57fb66ebe3ec47b05923b7360008"
-  dependencies:
-    aurelia-dependency-injection "^1.2.0"
-    aurelia-loader "^1.0.0"
-    aurelia-metadata "^1.0.2"
-    aurelia-pal "^1.0.0"
-    aurelia-templating "^1.1.2"
+aurelia-hot-module-reload@^0.2.0:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/aurelia-hot-module-reload/-/aurelia-hot-module-reload-0.2.1.tgz#f8d58bb966649250d36058b39a6fc19b041ef41b"
 
 aurelia-loader@^1.0.0:
   version "1.0.0"
@@ -121,10 +99,6 @@ aurelia-loader@^1.0.0:
   dependencies:
     aurelia-metadata "^1.0.0"
     aurelia-path "^1.0.0"
-
-aurelia-logging@^1.0.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/aurelia-logging/-/aurelia-logging-1.2.0.tgz#22007dddc56fb5bbbfa3a865bd1bfc4020290ddb"
 
 aurelia-metadata@^1.0.0, aurelia-metadata@^1.0.2:
   version "1.0.2"
@@ -139,25 +113,6 @@ aurelia-pal@^1.0.0, aurelia-pal@^1.1.1:
 aurelia-path@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/aurelia-path/-/aurelia-path-1.1.1.tgz#caa9d20bc8515a5f9f286d9a3b18d81b2c85b0dd"
-
-aurelia-task-queue@^1.0.0, aurelia-task-queue@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/aurelia-task-queue/-/aurelia-task-queue-1.1.0.tgz#45afddb2ecb07e1b1b2d1f85e90f095220c24ade"
-  dependencies:
-    aurelia-pal "^1.0.0"
-
-aurelia-templating@^1.1.2:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/aurelia-templating/-/aurelia-templating-1.1.4.tgz#b278ea8dfb3706575092247045d441b0e3488283"
-  dependencies:
-    aurelia-binding "^1.0.0"
-    aurelia-dependency-injection "^1.0.0"
-    aurelia-loader "^1.0.0"
-    aurelia-logging "^1.0.0"
-    aurelia-metadata "^1.0.0"
-    aurelia-pal "^1.0.0"
-    aurelia-path "^1.0.0"
-    aurelia-task-queue "^1.1.0"
 
 "aurelia-tools@https://github.com/aurelia/tools.git#cli":
   version "1.0.0"
@@ -768,22 +723,22 @@ load-json-file@^1.0.0:
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
 
-lodash._reinterpolate@~3.0.0:
+lodash._reinterpolate@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
 
 lodash.template@^4.0.2:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.4.0.tgz#e73a0385c8355591746e020b99679c690e68fba0"
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.5.0.tgz#f976195cf3f347d0d5f52483569fe8031ccce8ab"
   dependencies:
-    lodash._reinterpolate "~3.0.0"
+    lodash._reinterpolate "^3.0.0"
     lodash.templatesettings "^4.0.0"
 
 lodash.templatesettings@^4.0.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.1.0.tgz#2b4d4e95ba440d915ff08bc899e4553666713316"
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.2.0.tgz#e481310f049d3cf6d47e912ad09313b154f0fb33"
   dependencies:
-    lodash._reinterpolate "~3.0.0"
+    lodash._reinterpolate "^3.0.0"
 
 lodash@^4.0.0, lodash@^4.13.1, lodash@^4.2.1, lodash@^4.5.1:
   version "4.16.6"
