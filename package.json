@@ -22,14 +22,13 @@
   "scripts": {
     "build:compile": "aurelia-tools ts-build-all --continue-when-failed --clean-before",
     "build": "npm run build:compile",
-    "postbuild": "npm run build:doc",
     "prebuild:doc": "aurelia-tools doc-build --continue-when-failed",
     "build:doc": "aurelia-tools doc-shape-defs && aurelia-tools typedoc",
     "postbuild:doc": "aurelia-tools doc-jsonshape",
     "release": "aurelia-tools changelog"
   },
   "dependencies": {
-    "aurelia-hot-module-reload": "^0.2.0",
+    "aurelia-hot-module-reload": "^0.3.0",
     "aurelia-loader": "^1.0.0",
     "aurelia-metadata": "^1.0.2",
     "aurelia-pal": "^1.1.1"
@@ -37,8 +36,8 @@
   "devDependencies": {
     "aurelia-tools": "https://github.com/aurelia/tools.git#cli",
     "concurrently": "^3.1.0",
-    "cross-env": "^3.1.3",
-    "typescript": "^2.1.4"
+    "cross-env": "^7.0.2",
+    "typescript": "^4.0.2"
   },
   "aurelia": {
     "documentation": {
