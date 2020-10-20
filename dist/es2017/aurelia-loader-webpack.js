@@ -51,7 +51,7 @@ export class WebpackLoader extends Loader {
                     if (!this.hmrContext) {
                         // Note: Please do NOT import aurelia-hot-module-reload statically at the top of file.
                         //       We don't want to bundle it when not using --hot, in particular in production builds.
-                        //       Webpack will evaluate the `if (module.hot)` above at build time 
+                        //       Webpack will evaluate the `if (module.hot)` above at build time
                         //       and will include (or not) aurelia-hot-module-reload accordingly.
                         const { HmrContext } = require('aurelia-hot-module-reload');
                         this.hmrContext = new HmrContext(this);
@@ -190,9 +190,11 @@ export class WebpackLoader extends Loader {
     */
     async loadText(url) {
         const result = await this.loadModule(url, false);
-        if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+        // css-loader could use esModule:true
+        const defaultExport = result && result.__esModule ? result.default : result;
+        if (defaultExport instanceof Array && defaultExport[0] instanceof Array && defaultExport.hasOwnProperty('toString')) {
             // we're dealing with a file loaded using the css-loader:
-            return result.toString();
+            return defaultExport.toString();
         }
         return result;
     }

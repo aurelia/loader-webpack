@@ -286,15 +286,16 @@ var WebpackLoader = /** @class */ (function (_super) {
     */
     WebpackLoader.prototype.loadText = function (url) {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var result, defaultExport;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadModule(url, false)];
                     case 1:
                         result = _a.sent();
-                        if (result instanceof Array && result[0] instanceof Array && result.hasOwnProperty('toString')) {
+                        defaultExport = result && result.__esModule ? result.default : result;
+                        if (defaultExport instanceof Array && defaultExport[0] instanceof Array && defaultExport.hasOwnProperty('toString')) {
                             // we're dealing with a file loaded using the css-loader:
-                            return [2 /*return*/, result.toString()];
+                            return [2 /*return*/, defaultExport.toString()];
                         }
                         return [2 /*return*/, result];
                 }
