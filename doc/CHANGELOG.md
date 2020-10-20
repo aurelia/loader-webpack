@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.2"></a>
+## [2.2.2](https://github.com/aurelia/loader-webpack/compare/2.2.1...2.2.2) (2020-10-20)
+
+
+### Bug Fixes
+
+* fix compatibility with latest css-loader v4 ([29fc07a](https://github.com/aurelia/loader-webpack/commit/29fc07a)), closes [aurelia/cli#1186](https://github.com/aurelia/cli/issues/1186) [aurelia/webpack-plugin#168](https://github.com/aurelia/webpack-plugin/issues/168)
+
+
+
 <a name="2.2.1"></a>
 ## [2.2.1](https://github.com/aurelia/loader-webpack/compare/2.1.0...2.2.1) (2018-06-19)
 
