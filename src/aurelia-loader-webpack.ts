@@ -1,6 +1,6 @@
-import {Origin} from 'aurelia-metadata';
-import {Loader, TemplateRegistryEntry, LoaderPlugin} from 'aurelia-loader';
-import {DOM, PLATFORM} from 'aurelia-pal';
+import { Loader, LoaderPlugin as AureliaLoaderPlugin, TemplateRegistryEntry } from 'aurelia-loader';
+import { Origin } from 'aurelia-metadata';
+import { DOM, PLATFORM } from 'aurelia-pal';
 
 export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
 
@@ -49,7 +49,7 @@ export function ensureOriginOnExports(moduleExports: any, moduleId: string) {
 */
 export class WebpackLoader extends Loader {
   moduleRegistry = Object.create(null);
-  loaderPlugins = Object.create(null) as { [name: string]: LoaderPlugin & { hot?: (moduleId: string) => void } };
+  loaderPlugins = Object.create(null) as { [name: string]: AureliaLoaderPlugin & { hot?: (moduleId: string) => void } };
   modulesBeingLoaded = new Map<string, Promise<any>>();
   templateLoader: TextTemplateLoader;
   hmrContext: {
@@ -85,7 +85,7 @@ export class WebpackLoader extends Loader {
         }
         return entry;
       }
-    } as LoaderPlugin);
+    } as AureliaLoaderPlugin);
 
     PLATFORM.eachModule = callback => {
       const registry = __webpack_require__.c;
@@ -232,7 +232,7 @@ export class WebpackLoader extends Loader {
       // we're dealing with a file loaded using the css-loader:
       return defaultExport.toString();
     }
-    return result;
+    return typeof result === "string" ? result : defaultExport;
   }
 
   /**
@@ -250,7 +250,7 @@ export class WebpackLoader extends Loader {
   * @param pluginName The name of the plugin.
   * @param implementation The plugin implementation.
   */
-  addPlugin(pluginName: string, implementation: LoaderPlugin) {
+  addPlugin(pluginName: string, implementation: AureliaLoaderPlugin) {
     this.loaderPlugins[pluginName] = implementation;
   }
 }
