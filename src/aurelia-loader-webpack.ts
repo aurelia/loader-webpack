@@ -1,6 +1,15 @@
 import { Loader, LoaderPlugin as AureliaLoaderPlugin, TemplateRegistryEntry } from 'aurelia-loader';
 import { Origin } from 'aurelia-metadata';
 import { DOM, PLATFORM } from 'aurelia-pal';
+import { WebpackHotModule } from './webpack-hot-interface';
+
+/** @internal */
+declare global {
+  const __webpack_require__: import('./webpack-runtime').__webpack_require__;
+  interface NodeModule {
+    hot: WebpackHotModule;
+  }
+}
 
 export type LoaderPlugin = { fetch: (address: string) => Promise<TemplateRegistryEntry> | TemplateRegistryEntry };
 
@@ -53,7 +62,7 @@ export class WebpackLoader extends Loader {
   modulesBeingLoaded = new Map<string, Promise<any>>();
   templateLoader: TextTemplateLoader;
   hmrContext: {
-    handleModuleChange(moduleId: string, hot: Webpack.WebpackHotModule): Promise<void>,
+    handleModuleChange(moduleId: string, hot: WebpackHotModule): Promise<void>,
     handleViewChange(moduleId: string): Promise<void>
   };
 
@@ -105,7 +114,7 @@ export class WebpackLoader extends Loader {
     };
   }
 
-  async _import(address: string, defaultHMR = true) {
+  async _import(address: string, defaultHMR = true): Promise<any> {
     const addressParts = address.split('!');
     const moduleId = addressParts.splice(addressParts.length - 1, 1)[0];
     const loaderPlugin = addressParts.length === 1 ? addressParts[0] : null;

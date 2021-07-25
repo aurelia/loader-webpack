@@ -1,7 +1,14 @@
 {
-  "extends": "./node_modules/aurelia-tools/tsc/tsconfig",
   "compilerOptions": {
-    "noUnusedParameters": false
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["ES2015", "DOM"],
+    "moduleResolution": "node",
+    "noUnusedParameters": false,
+    "types": ["node"],
+    "stripInternal": true,
+    "declaration": true,
+    "declarationDir": "dist/types"
   },
   "exclude": [
     ".vscode",

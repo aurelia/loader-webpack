@@ -1,4 +1,4 @@
 {
   "name": "aurelia-loader-webpack",
-  "main": "dist/commonjs/aurelia-loader-webpack.d.ts"
+  "main": "dist/types/aurelia-loader-webpack.d.ts"
 }

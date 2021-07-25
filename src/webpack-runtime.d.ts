@@ -1,4 +1,4 @@
-declare const __webpack_require__: {
+export type __webpack_require__  = {
   (moduleId: string): any;
   /**
    * require.ensure method
