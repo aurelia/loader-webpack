@@ -1,18 +1,36 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+import { Loader } from 'aurelia-loader';
+import { Origin } from 'aurelia-metadata';
+import { PLATFORM, DOM } from 'aurelia-pal';
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-import { Origin } from 'aurelia-metadata';
-import { Loader } from 'aurelia-loader';
-import { DOM, PLATFORM } from 'aurelia-pal';
+}
+
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
-export class TextTemplateLoader {
+class TextTemplateLoader {
     /**
     * Loads a template.
     * @param loader The loader that is requesting the template load.
@@ -26,7 +44,7 @@ export class TextTemplateLoader {
         });
     }
 }
-export function ensureOriginOnExports(moduleExports, moduleId) {
+function ensureOriginOnExports(moduleExports, moduleId) {
     let target = moduleExports;
     let key;
     let exportedValue;
@@ -47,7 +65,7 @@ export function ensureOriginOnExports(moduleExports, moduleId) {
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
-export class WebpackLoader extends Loader {
+class WebpackLoader extends Loader {
     constructor() {
         super();
         this.moduleRegistry = Object.create(null);
@@ -211,7 +229,7 @@ export class WebpackLoader extends Loader {
                 // we're dealing with a file loaded using the css-loader:
                 return defaultExport.toString();
             }
-            return result;
+            return typeof result === "string" ? result : defaultExport;
         });
     }
     /**
@@ -233,3 +251,5 @@ export class WebpackLoader extends Loader {
     }
 }
 PLATFORM.Loader = WebpackLoader;
+
+export { TextTemplateLoader, WebpackLoader, ensureOriginOnExports };

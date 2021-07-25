@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.3"></a>
+## [2.2.3](https://github.com/aurelia/loader-webpack/compare/2.2.2...2.2.3) (2021-07-25)
+
+
+### Bug Fixes
+
+* returns object instead of string ([7c898b6](https://github.com/aurelia/loader-webpack/commit/7c898b6))
+
 <a name="2.2.2"></a>
 ## [2.2.2](https://github.com/aurelia/loader-webpack/compare/2.2.1...2.2.2) (2020-10-20)
 

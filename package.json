@@ -1,6 +1,6 @@
 {
   "name": "aurelia-loader-webpack",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "An implementation of Aurelia's loader interface to enable webpack.",
   "keywords": [
     "aurelia",
@@ -20,12 +20,7 @@
     "url": "http://github.com/aurelia/loader-webpack"
   },
   "scripts": {
-    "build:compile": "aurelia-tools ts-build-all --continue-when-failed --clean-before",
-    "build": "tsc",
-    "prebuild:doc": "aurelia-tools doc-build --continue-when-failed",
-    "build:doc": "aurelia-tools doc-shape-defs && aurelia-tools typedoc",
-    "postbuild:doc": "aurelia-tools doc-jsonshape",
-    "release": "aurelia-tools changelog"
+    "build": "rollup -c"
   },
   "dependencies": {
     "aurelia-hot-module-reload": "^0.3.0",
@@ -34,10 +29,9 @@
     "aurelia-pal": "^1.1.1"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.2.3",
     "@types/node": "^16.4.2",
-    "aurelia-tools": "https://github.com/aurelia/tools.git#cli",
-    "concurrently": "^3.1.0",
-    "cross-env": "^7.0.2",
+    "rollup": "^2.54.0",
     "typescript": "^4.0.2"
   }
 }

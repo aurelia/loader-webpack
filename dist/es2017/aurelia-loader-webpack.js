@@ -1,10 +1,11 @@
-import { Origin } from 'aurelia-metadata';
 import { Loader } from 'aurelia-loader';
-import { DOM, PLATFORM } from 'aurelia-pal';
+import { Origin } from 'aurelia-metadata';
+import { PLATFORM, DOM } from 'aurelia-pal';
+
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
-export class TextTemplateLoader {
+class TextTemplateLoader {
     /**
     * Loads a template.
     * @param loader The loader that is requesting the template load.
@@ -16,7 +17,7 @@ export class TextTemplateLoader {
         entry.template = DOM.createTemplateFromMarkup(text);
     }
 }
-export function ensureOriginOnExports(moduleExports, moduleId) {
+function ensureOriginOnExports(moduleExports, moduleId) {
     let target = moduleExports;
     let key;
     let exportedValue;
@@ -37,7 +38,7 @@ export function ensureOriginOnExports(moduleExports, moduleId) {
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
-export class WebpackLoader extends Loader {
+class WebpackLoader extends Loader {
     constructor() {
         super();
         this.moduleRegistry = Object.create(null);
@@ -196,7 +197,7 @@ export class WebpackLoader extends Loader {
             // we're dealing with a file loaded using the css-loader:
             return defaultExport.toString();
         }
-        return result;
+        return typeof result === "string" ? result : defaultExport;
     }
     /**
     * Alters a module id so that it includes a plugin loader.
@@ -217,3 +218,5 @@ export class WebpackLoader extends Loader {
     }
 }
 PLATFORM.Loader = WebpackLoader;
+
+export { TextTemplateLoader, WebpackLoader, ensureOriginOnExports };

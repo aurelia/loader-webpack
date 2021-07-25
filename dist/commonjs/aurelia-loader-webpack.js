@@ -1,23 +1,53 @@
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var aureliaLoader = require('aurelia-loader');
+var aureliaMetadata = require('aurelia-metadata');
+var aureliaPal = require('aurelia-pal');
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
+}
+
+function __generator(thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
@@ -43,11 +73,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var aurelia_metadata_1 = require("aurelia-metadata");
-var aurelia_loader_1 = require("aurelia-loader");
-var aurelia_pal_1 = require("aurelia-pal");
+}
+
 /**
 * An implementation of the TemplateLoader interface implemented with text-based loading.
 */
@@ -68,7 +95,7 @@ var TextTemplateLoader = /** @class */ (function () {
                     case 0: return [4 /*yield*/, loader.loadText(entry.address)];
                     case 1:
                         text = _a.sent();
-                        entry.template = aurelia_pal_1.DOM.createTemplateFromMarkup(text);
+                        entry.template = aureliaPal.DOM.createTemplateFromMarkup(text);
                         return [2 /*return*/];
                 }
             });
@@ -76,7 +103,6 @@ var TextTemplateLoader = /** @class */ (function () {
     };
     return TextTemplateLoader;
 }());
-exports.TextTemplateLoader = TextTemplateLoader;
 function ensureOriginOnExports(moduleExports, moduleId) {
     var target = moduleExports;
     var key;
@@ -84,18 +110,17 @@ function ensureOriginOnExports(moduleExports, moduleId) {
     if (target.__useDefault) {
         target = target.default;
     }
-    aurelia_metadata_1.Origin.set(target, new aurelia_metadata_1.Origin(moduleId, 'default'));
+    aureliaMetadata.Origin.set(target, new aureliaMetadata.Origin(moduleId, 'default'));
     if (typeof target === 'object') {
         for (key in target) {
             exportedValue = target[key];
             if (typeof exportedValue === 'function') {
-                aurelia_metadata_1.Origin.set(exportedValue, new aurelia_metadata_1.Origin(moduleId, key));
+                aureliaMetadata.Origin.set(exportedValue, new aureliaMetadata.Origin(moduleId, key));
             }
         }
     }
     return moduleExports;
 }
-exports.ensureOriginOnExports = ensureOriginOnExports;
 /**
 * A default implementation of the Loader abstraction which works with webpack (extended common-js style).
 */
@@ -142,7 +167,7 @@ var WebpackLoader = /** @class */ (function (_super) {
                 });
             }); }
         });
-        aurelia_pal_1.PLATFORM.eachModule = function (callback) {
+        aureliaPal.PLATFORM.eachModule = function (callback) {
             var registry = __webpack_require__.c;
             var cachedModuleIds = Object.getOwnPropertyNames(registry);
             cachedModuleIds
@@ -300,7 +325,7 @@ var WebpackLoader = /** @class */ (function (_super) {
                             // we're dealing with a file loaded using the css-loader:
                             return [2 /*return*/, defaultExport.toString()];
                         }
-                        return [2 /*return*/, result];
+                        return [2 /*return*/, typeof result === "string" ? result : defaultExport];
                 }
             });
         });
@@ -323,6 +348,9 @@ var WebpackLoader = /** @class */ (function (_super) {
         this.loaderPlugins[pluginName] = implementation;
     };
     return WebpackLoader;
-}(aurelia_loader_1.Loader));
+}(aureliaLoader.Loader));
+aureliaPal.PLATFORM.Loader = WebpackLoader;
+
+exports.TextTemplateLoader = TextTemplateLoader;
 exports.WebpackLoader = WebpackLoader;
-aurelia_pal_1.PLATFORM.Loader = WebpackLoader;
+exports.ensureOriginOnExports = ensureOriginOnExports;
