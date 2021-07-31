@@ -20,7 +20,8 @@
     "url": "http://github.com/aurelia/loader-webpack"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "postbuild": "tsc --declaration --emitDeclarationOnly"
   },
   "dependencies": {
     "aurelia-hot-module-reload": "^0.3.0",
