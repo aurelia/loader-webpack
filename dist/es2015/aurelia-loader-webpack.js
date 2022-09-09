@@ -2,7 +2,7 @@ import { Loader } from 'aurelia-loader';
 import { Origin } from 'aurelia-metadata';
 import { PLATFORM, DOM } from 'aurelia-pal';
 
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -225,12 +225,34 @@ class WebpackLoader extends Loader {
             const result = yield this.loadModule(url, false);
             // css-loader could use esModule:true
             const defaultExport = result && result.__esModule ? result.default : result;
-            if (defaultExport instanceof Array && defaultExport[0] instanceof Array && defaultExport.hasOwnProperty('toString')) {
+            if (this.isCssLoaderModule(defaultExport)) {
                 // we're dealing with a file loaded using the css-loader:
-                return defaultExport.toString();
+                return this.getCssText(defaultExport);
             }
             return typeof result === "string" ? result : defaultExport;
         });
+    }
+    /**
+     * Check if a loaded module is a css-loader module
+     * @param o The loaded module
+     * @returns `true` when {@link o} is a {@link CssLoaderModule}; otherwise false
+     */
+    isCssLoaderModule(o) {
+        return o instanceof Array && o[0] instanceof Array && o.hasOwnProperty('toString');
+    }
+    /**
+     * Get CSS text from loaded css-loader module
+     * @param cssLoaderModule The {@link CssLoaderModule}
+     * @returns The css content with potential source map references
+     */
+    getCssText(cssLoaderModule) {
+        let result = cssLoaderModule.toString();
+        // If some css-loader modules include source maps,
+        // ensure /*# sourceURL=[...] */ is removed to avoid chrome devtools problems
+        if (cssLoaderModule.some(m => m[3])) {
+            result = result.replace(/^\/\*# sourceURL=.* \*\/\s*\n/gm, "");
+        }
+        return result;
     }
     /**
     * Alters a module id so that it includes a plugin loader.

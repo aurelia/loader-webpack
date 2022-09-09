@@ -1,8 +1,14 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-<a name="2.2.4"></a>
+### [2.2.5](https://github.com/aurelia/loader-webpack/compare/2.2.4...2.2.5) (2022-09-09)
+
+
+### Bug Fixes
+
+* remove /*# sourceURL= */ from css-loader content ([8f12aed](https://github.com/aurelia/loader-webpack/commit/8f12aed))
+
 ## [2.2.4](https://github.com/aurelia/loader-webpack/compare/2.2.4...2.2.3) (2021-07-31)
 
 
@@ -10,7 +16,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * include typings in release ([7c898b6](https://github.com/aurelia/loader-webpack/commit/7c898b6))
 
-<a name="2.2.3"></a>
 ## [2.2.3](https://github.com/aurelia/loader-webpack/compare/2.2.2...2.2.3) (2021-07-25)
 
 
@@ -18,7 +23,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * returns object instead of string ([7c898b6](https://github.com/aurelia/loader-webpack/commit/7c898b6))
 
-<a name="2.2.2"></a>
 ## [2.2.2](https://github.com/aurelia/loader-webpack/compare/2.2.1...2.2.2) (2020-10-20)
 
 
@@ -28,7 +32,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="2.2.1"></a>
 ## [2.2.1](https://github.com/aurelia/loader-webpack/compare/2.1.0...2.2.1) (2018-06-19)
 
 
@@ -39,7 +42,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="1.0.3"></a>
 ## [1.0.3](https://github.com/aurelia/loader-webpack/compare/1.0.2...v1.0.3) (2016-09-22)
 
 
@@ -49,7 +51,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="1.0.2"></a>
 ## [1.0.2](https://github.com/aurelia/loader-webpack/compare/1.0.1...v1.0.2) (2016-07-29)
 
 
@@ -59,7 +60,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="1.0.1"></a>
 ## [1.0.1](https://github.com/aurelia/loader-webpack/compare/1.0.0...v1.0.1) (2016-07-29)
 
 
@@ -69,8 +69,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="1.0.0"></a>
-# [1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-rc.1.0.0...v1.0.0) (2016-07-27)
+## [1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-rc.1.0.0...v1.0.0) (2016-07-27)
 
 
 ### Features
@@ -81,8 +80,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 
-<a name="1.0.0-rc.1.0.0"></a>
-# [1.0.0-rc.1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-beta.2.0.1...v1.0.0-rc.1.0.0) (2016-06-22)
+## [1.0.0-rc.1.0.0](https://github.com/aurelia/loader-webpack/compare/1.0.0-beta.2.0.1...v1.0.0-rc.1.0.0) (2016-06-22)
 
 
 

@@ -83,6 +83,18 @@ export declare class WebpackLoader extends Loader {
     */
     loadText(url: string): Promise<any>;
     /**
+     * Check if a loaded module is a css-loader module
+     * @param o The loaded module
+     * @returns `true` when {@link o} is a {@link CssLoaderModule}; otherwise false
+     */
+    private isCssLoaderModule;
+    /**
+     * Get CSS text from loaded css-loader module
+     * @param cssLoaderModule The {@link CssLoaderModule}
+     * @returns The css content with potential source map references
+     */
+    private getCssText;
+    /**
     * Alters a module id so that it includes a plugin loader.
     * @param url The url of the module to load.
     * @param pluginName The plugin to apply to the module id.
