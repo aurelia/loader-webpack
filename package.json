@@ -19,6 +19,12 @@
     "type": "git",
     "url": "http://github.com/aurelia/loader-webpack"
   },
+  "files": [
+    "dist",
+    "doc/CHANGELOG.md",
+    "bowser.json",
+    "typings.json"
+  ],
   "scripts": {
     "build": "rollup -c",
     "postbuild": "tsc --declaration --emitDeclarationOnly",
